@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1037598226405",
+    "project_id": "expose-banq",
+    "storage_bucket": "expose-banq.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1037598226405:android:29c6bcf26a64a48ed6610c",
+        "android_client_info": {
+          "package_name": "com.example.expose_banq"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1037598226405-4ljv18d03nn104vn30gu06nrlp8l8etf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.expose_banq",
+            "certificate_hash": "c795156fe5a0a9faba12378d53cf59318be04599"
+          }
+        },
+        {
+          "client_id": "1037598226405-9oidj2bp548sk2q98ll39uiloohm6o0l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpCz766aXPqPbUzoA2liqwRF1Q2feHs2I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1037598226405-9oidj2bp548sk2q98ll39uiloohm6o0l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
