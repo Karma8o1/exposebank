@@ -1,6 +1,8 @@
 import 'package:expose_banq/const/exports.dart';
 import 'package:expose_banq/view/auth/pin/login_pin.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:get/get.dart';
 
 import '../forgot_pass/forgot_pass_screen.dart';
@@ -58,6 +60,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: CustomTextField(
                     controller: usernameOrPhoneController,
                     hintText: 'username or phone number',
+                    inputFormatter: [
+                      MaskedInputFormatter('0000-0000000'),
+                    ],
                   ),
                 ),
 
@@ -69,6 +74,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: pinCodeController,
                     hintText: 'Pin Code',
                     keyboardType: TextInputType.number,
+                    inputFormatter: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                      MaskedInputFormatter('00000'),
+                    ],
                   ),
                 ),
 
@@ -78,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.only(right: 32.0),
                     child: TextButton(
                       onPressed: () {
-                        Get.to(ForgotPasswordScreen());
+                        Get.to(const ForgotPasswordScreen());
                       },
                       child: Text(
                         'Forgot Password?',
@@ -100,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: CustomGradientButton(
                     btnText: 'Login',
                     onTap: () {
-                      Get.to(LoginPinScreen());
+                      Get.to(const LoginPinScreen());
                     },
                   ),
                 ),
@@ -130,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: height(context) * 0.01),
                 TextButton(
                   onPressed: () {
-                    Get.to(SignupScreen());
+                    Get.to(const SignupScreen());
                   },
                   child: Text(
                     'Signup',

@@ -1,7 +1,9 @@
+import 'package:expose_banq/const/language.dart';
 import 'package:expose_banq/view/kyc/kyc_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:get/get.dart';
-
 import '../../../const/exports.dart';
 import '../login/login_screen.dart';
 
@@ -13,7 +15,6 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-
   TextEditingController firstNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
@@ -34,7 +35,6 @@ class _SignupScreenState extends State<SignupScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
                 /// app name
                 SizedBox(height: height(context) * 0.05),
                 Row(
@@ -57,24 +57,39 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 /// francaise texts
                 const SizedBox(height: 16.0),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18.0),
-                    gradient: const LinearGradient(
-                      colors: [
-                        AppColors.gradientOneColor,
-                        AppColors.gradientTwoColor,
-                        AppColors.gradientThreeColor,
-                      ],
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      if (locale == const Locale('en', 'US')) {
+                        locale = const Locale('fr', 'BE');
+                        Get.snackbar('Language Changed', 'To French');
+                      } else {
+                        locale = const Locale('en', 'US');
+                        Get.snackbar('Language Changed', 'To English');
+                      }
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18.0),
+                      gradient: const LinearGradient(
+                        colors: [
+                          AppColors.gradientOneColor,
+                          AppColors.gradientTwoColor,
+                          AppColors.gradientThreeColor,
+                        ],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      ),
                     ),
-                  ),
-                  child: Text('Francaise',
-                    style: poppinsRegular.copyWith(
-                      fontSize: 16.0,
-                      color: AppColors.whiteColor,
+                    child: Text(
+                      'Francaise',
+                      style: poppinsRegular.copyWith(
+                        fontSize: 16.0,
+                        color: AppColors.whiteColor,
+                      ),
                     ),
                   ),
                 ),
@@ -109,6 +124,10 @@ class _SignupScreenState extends State<SignupScreen> {
                     controller: phoneNumberController,
                     hintText: 'Phone Number',
                     keyboardType: TextInputType.phone,
+                    inputFormatter: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                      MaskedInputFormatter('0000-0000000')
+                    ],
                   ),
                 ),
 
@@ -143,7 +162,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: CustomGradientButton(
                     btnText: 'Enter',
                     onTap: () {
-                      Get.to(KYCScreen());
+                      // Get.to(const KYCScreen());
+                      
                     },
                   ),
                 ),

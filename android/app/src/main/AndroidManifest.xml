@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.eb.expose_banq">
+    package="com.example.expose_banq">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="expose_banq"

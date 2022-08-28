@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../const/exports.dart';
 
@@ -7,13 +8,16 @@ class CustomTextField extends StatelessWidget {
   final String? hintText;
   final TextEditingController? controller;
   final double? radius;
+  final List<TextInputFormatter>? inputFormatter;
 
-  const CustomTextField({Key? key,
+  CustomTextField({
+    Key? key,
     required this.controller,
     this.keyboardType = TextInputType.text,
     required this.hintText,
     this.radius = 20.0,
-}) : super(key: key);
+    this.inputFormatter,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +35,7 @@ class CustomTextField extends StatelessWidget {
         ),
         controller: controller,
         keyboardType: keyboardType,
+        inputFormatters: inputFormatter,
         decoration: InputDecoration(
           border: InputBorder.none,
           contentPadding: const EdgeInsets.only(left: 24.0),
