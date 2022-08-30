@@ -15,7 +15,6 @@ class DrawerScreen extends StatefulWidget {
 }
 
 class _DrawerScreenState extends State<DrawerScreen> {
-
   final zoomDrawerController = ZoomDrawerController();
 
   @override
@@ -41,7 +40,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
   }
 }
 
-
 class DrawerOneScreen extends StatefulWidget {
   const DrawerOneScreen({Key? key}) : super(key: key);
 
@@ -50,7 +48,6 @@ class DrawerOneScreen extends StatefulWidget {
 }
 
 class _DrawerOneScreenState extends State<DrawerOneScreen> {
-
   final zoomDrawerController = ZoomDrawerController();
 
   @override

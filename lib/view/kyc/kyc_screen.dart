@@ -5,8 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class KYCScreen extends StatefulWidget {
-  const KYCScreen({Key? key}) : super(key: key);
-
+  KYCScreen(
+      {Key? key,
+      required this.email,
+      required this.phoneNumber,
+      required this.pin,
+      required this.userName})
+      : super(key: key);
+  String email, phoneNumber, userName, pin;
+// phoneNumber: phoneNumberController.text.trim(),
+  //     firstName: firstNameController.text.trim(),
+  //     email: emailController.text.trim(),
+  //     username: usernameController.text.trim(),
+  //     pinCode: pinCodeController.text.trim(),
   @override
   State<KYCScreen> createState() => _KYCScreenState();
 }
@@ -380,9 +391,11 @@ class _KYCScreenState extends State<KYCScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
-              child: Text('Snap passport size photo here (selfie). Let us see your both ears,'
-                  ' chin, forehead, eyes clearly. No smiles. Look direct to the camera.',
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+              child: Text(
+                'Snap passport size photo here (selfie). Let us see your both ears,'
+                ' chin, forehead, eyes clearly. No smiles. Look direct to the camera.',
                 style: poppinsLight.copyWith(
                   fontSize: 11.0,
                   color: AppColors.greyColor,
@@ -393,7 +406,7 @@ class _KYCScreenState extends State<KYCScreen> {
             /// national id card front photo
             Container(
               margin:
-              const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               height: height(context) * 0.2,
               width: width(context),
               decoration: BoxDecoration(
@@ -409,8 +422,10 @@ class _KYCScreenState extends State<KYCScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
-              child: Text('Upload National identity card number (front) or Passport number or birth certificate',
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+              child: Text(
+                'Upload National identity card number (front) or Passport number or birth certificate',
                 style: poppinsLight.copyWith(
                   fontSize: 11.0,
                   color: AppColors.greyColor,
@@ -421,7 +436,7 @@ class _KYCScreenState extends State<KYCScreen> {
             /// national id card back photo
             Container(
               margin:
-              const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               height: height(context) * 0.2,
               width: width(context),
               decoration: BoxDecoration(
@@ -437,8 +452,10 @@ class _KYCScreenState extends State<KYCScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
-              child: Text('Upload National identity card number (back)',
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 4.0),
+              child: Text(
+                'Upload National identity card number (back)',
                 style: poppinsLight.copyWith(
                   fontSize: 11.0,
                   color: AppColors.greyColor,
@@ -455,7 +472,7 @@ class _KYCScreenState extends State<KYCScreen> {
               child: CustomGradientButton(
                 btnText: 'Submit',
                 onTap: () {
-                  Get.to(CreatePinScreen());
+                  Get.to(const CreatePinScreen());
                 },
                 btnColorOne: AppColors.violetColor,
                 btnColorTwo: AppColors.violetColor,

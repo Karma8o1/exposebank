@@ -9,14 +9,18 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
   final double? radius;
   final List<TextInputFormatter>? inputFormatter;
+  final bool obscure;
+  final Function? validator;
 
-  CustomTextField({
+  const CustomTextField({
     Key? key,
     required this.controller,
     this.keyboardType = TextInputType.text,
     required this.hintText,
     this.radius = 20.0,
     this.inputFormatter,
+    this.obscure = false,
+    this.validator,
   }) : super(key: key);
 
   @override
@@ -33,6 +37,7 @@ class CustomTextField extends StatelessWidget {
           fontSize: 18.0,
           color: AppColors.fieldTextColor.withOpacity(0.5),
         ),
+        obscureText: obscure,
         controller: controller,
         keyboardType: keyboardType,
         inputFormatters: inputFormatter,

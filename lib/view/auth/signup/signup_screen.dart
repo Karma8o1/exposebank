@@ -1,11 +1,18 @@
-import 'package:expose_banq/const/language.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expose_banq/const/loading.dart';
+import 'package:expose_banq/controllers/authController.dart';
+import 'package:expose_banq/main.dart';
 import 'package:expose_banq/view/kyc/kyc_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
+import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:get/get.dart';
 import '../../../const/exports.dart';
 import '../login/login_screen.dart';
+
+late final _formKey;
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -20,190 +27,224 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
   TextEditingController pinCodeController = TextEditingController();
+  @override
+  void initState() {
+    _formKey = GlobalKey<FormState>();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.blackColor,
-      body: SizedBox(
-        height: height(context),
-        width: width(context),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 40.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                /// app name
-                SizedBox(height: height(context) * 0.05),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    AppNameWidget(),
-                  ],
-                ),
-
-                /// exposers texts
-                const SizedBox(height: 16.0),
-                Text(
-                  '#Exposers',
-                  style: poppinsMedium.copyWith(
-                    fontSize: 16.0,
-                    color: AppColors.whiteColor,
-                  ),
-                ),
-
-                /// francaise texts
-                const SizedBox(height: 16.0),
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      if (locale == const Locale('en', 'US')) {
-                        locale = const Locale('fr', 'BE');
-                        Get.snackbar('Language Changed', 'To French');
-                      } else {
-                        locale = const Locale('en', 'US');
-                        Get.snackbar('Language Changed', 'To English');
-                      }
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18.0),
-                      gradient: const LinearGradient(
-                        colors: [
-                          AppColors.gradientOneColor,
-                          AppColors.gradientTwoColor,
-                          AppColors.gradientThreeColor,
-                        ],
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                      ),
-                    ),
-                    child: Text(
-                      'Francaise',
-                      style: poppinsRegular.copyWith(
-                        fontSize: 16.0,
-                        color: AppColors.whiteColor,
-                      ),
-                    ),
-                  ),
-                ),
-
-                /// username or phone field
-                SizedBox(height: height(context) * 0.05),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: CustomTextField(
-                    controller: firstNameController,
-                    hintText: 'First Name',
-                    keyboardType: TextInputType.name,
-                  ),
-                ),
-
-                /// email field
-                const SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: CustomTextField(
-                    controller: emailController,
-                    hintText: 'Email',
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                ),
-
-                /// phone number field
-                const SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: CustomTextField(
-                    controller: phoneNumberController,
-                    hintText: 'Phone Number',
-                    keyboardType: TextInputType.phone,
-                    inputFormatter: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                      MaskedInputFormatter('0000-0000000')
+    return Form(
+      key: _formKey,
+      child: Scaffold(
+        backgroundColor: AppColors.blackColor,
+        body: SizedBox(
+          height: height(context),
+          width: width(context),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 40.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  /// app name
+                  SizedBox(height: height(context) * 0.05),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      AppNameWidget(),
                     ],
                   ),
-                ),
 
-                /// username field
-                const SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: CustomTextField(
-                    controller: usernameController,
-                    hintText: 'username ',
-                    keyboardType: TextInputType.name,
+                  /// exposers texts
+                  const SizedBox(height: 16.0),
+                  Text(
+                    '#Exposers',
+                    style: poppinsMedium.copyWith(
+                      fontSize: 16.0,
+                      color: AppColors.whiteColor,
+                    ),
                   ),
-                ),
 
-                /// pin code field
-                const SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: CustomTextField(
-                    controller: pinCodeController,
-                    hintText: 'Pin Code',
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-
-                /// enter button
-                const SizedBox(height: 24.0),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: height(context) * 0.13,
-                  ),
-                  child: CustomGradientButton(
-                    btnText: 'Enter',
+                  /// francaise texts
+                  const SizedBox(height: 16.0),
+                  InkWell(
                     onTap: () {
-                      // Get.to(const KYCScreen());
-                      
+                      setState(() {
+                        if (lang) {
+                          lang = !lang;
+                          prefs.setBool('lang', !lang);
+                          Get.updateLocale(const Locale('fr', 'FR'));
+                        } else {
+                          lang = !lang;
+                          prefs.setBool('lang', !lang);
+                          Get.updateLocale(const Locale('en', 'Us'));
+                        }
+                        Get.snackbar(
+                          'change'.tr,
+                          'language'.tr,
+                          backgroundColor: Colors.white,
+                          margin: const EdgeInsets.all(0),
+                          borderRadius: 0,
+                        );
+                      });
                     },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 8.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18.0),
+                        gradient: const LinearGradient(
+                          colors: [
+                            AppColors.gradientOneColor,
+                            AppColors.gradientTwoColor,
+                            AppColors.gradientThreeColor,
+                          ],
+                          begin: Alignment.topRight,
+                          end: Alignment.bottomLeft,
+                        ),
+                      ),
+                      child: Text(
+                        'Francaise',
+                        style: poppinsRegular.copyWith(
+                          fontSize: 16.0,
+                          color: AppColors.whiteColor,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
 
-                /// Already Have App Account? texts
-                SizedBox(height: height(context) * 0.05),
-                Text(
-                  'Already Have App Account?',
-                  style: poppinsRegular.copyWith(
-                    fontSize: 14.0,
-                    color: AppColors.whiteColor.withOpacity(0.5),
+                  /// username or phone field
+                  SizedBox(height: height(context) * 0.05),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: CustomTextField(
+                      controller: firstNameController,
+                      hintText: 'name'.tr,
+                      keyboardType: TextInputType.name,
+                    ),
                   ),
-                ),
 
-                /// divider
-                SizedBox(height: height(context) * 0.04),
-                Container(
-                  height: 1.5,
-                  width: 70.0,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                    color: AppColors.whiteColor,
+                  /// email field
+                  const SizedBox(height: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: CustomTextField(
+                      controller: emailController,
+                      hintText: 'email'.tr,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
                   ),
-                ),
 
-                /// Login Here button
-                SizedBox(height: height(context) * 0.01),
-                TextButton(
-                  onPressed: () {
-                    Get.to(LoginScreen());
-                  },
-                  child: Text(
-                    'Login Here',
+                  /// phone number field
+                  const SizedBox(height: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: CustomTextField(
+                      controller: phoneNumberController,
+                      hintText: 'phoneno'.tr,
+                      keyboardType: TextInputType.phone,
+                      inputFormatter: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[+,0-9]')),
+                      ],
+                    ),
+                  ),
+
+                  /// username field
+                  const SizedBox(height: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: CustomTextField(
+                      controller: usernameController,
+                      hintText: 'username'.tr,
+                      keyboardType: TextInputType.name,
+                    ),
+                  ),
+
+                  /// pin code field
+                  const SizedBox(height: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: CustomTextField(
+                      controller: pinCodeController,
+                      hintText: 'pin'.tr,
+                      keyboardType: TextInputType.number,
+                      obscure: true,
+                    ),
+                  ),
+
+                  /// enter button
+                  const SizedBox(height: 24.0),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: height(context) * 0.13,
+                    ),
+                    child: CustomGradientButton(
+                      btnText: 'Enter',
+                      onTap: () async {
+                        //information drilled to KYC form so the regsitration could be done after
+                        //KYC form is filled
+                        Get.to(KYCScreen(
+                            email: emailController.text,
+                            phoneNumber: phoneNumberController.text,
+                            pin: pinCodeController.text,
+                            userName: usernameController.text));
+                        //registers user to firebase and stores the collected data.
+                        // if (_formKey.currentState!.validate()) {
+                        //   showLoading(context);
+                        //   AuthController.registerUser(
+                        //     phoneNumber: phoneNumberController.text.trim(),
+                        //     firstName: firstNameController.text.trim(),
+                        //     email: emailController.text.trim(),
+                        //     username: usernameController.text.trim(),
+                        //     pinCode: pinCodeController.text.trim(),
+                        //     context: context,
+                        //   );
+                        // }
+                      },
+                    ),
+                  ),
+
+                  /// Already Have App Account? texts
+                  SizedBox(height: height(context) * 0.05),
+                  Text(
+                    'Already Have App Account?',
                     style: poppinsRegular.copyWith(
                       fontSize: 14.0,
                       color: AppColors.whiteColor.withOpacity(0.5),
                     ),
                   ),
-                ),
-              ],
+
+                  /// divider
+                  SizedBox(height: height(context) * 0.04),
+                  Container(
+                    height: 1.5,
+                    width: 70.0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: AppColors.whiteColor,
+                    ),
+                  ),
+
+                  /// Login Here button
+                  SizedBox(height: height(context) * 0.01),
+                  TextButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: Text(
+                      'Login Here',
+                      style: poppinsRegular.copyWith(
+                        fontSize: 14.0,
+                        color: AppColors.whiteColor.withOpacity(0.5),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

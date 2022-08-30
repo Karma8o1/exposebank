@@ -5,6 +5,8 @@ import 'dart:async';
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:elegant_notification/resources/arrays.dart';
 import 'package:expose_banq/main.dart';
+import 'package:expose_banq/view/auth/login/login_screen.dart';
+import 'package:expose_banq/view/wrapper/wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -43,8 +45,12 @@ class _SplashScreenState extends State<SplashScreen> {
           width: MediaQuery.of(context).size.width - 50,
         ).show(context);
       }
-      print('Data retrieved from hive: ${hiveData.get('firstTime')}');
-      Timer(const Duration(seconds: 2), () => Get.to(const OnBoardingScreen()));
+      // print('Data retrieved from hive: ${hiveData.get('firstTime')}');
+      Timer(
+          const Duration(seconds: 2),
+          () => Get.off(showOnboardingScreen
+              ? const OnBoardingScreen()
+              : const Wrapper()));
     });
     return BackGroundColorWidget(
       child: Scaffold(

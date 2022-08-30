@@ -1,4 +1,5 @@
 import 'package:expose_banq/const/exports.dart';
+import 'package:expose_banq/main.dart';
 import 'package:expose_banq/view/auth/signup/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -31,7 +32,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               Expanded(
                 child: PageView(
                   children: [
-
                     /// first page
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +56,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                             padding: const EdgeInsets.only(left: 24.0),
                             child: Text(
                               'Free Secured & \nTransparent Standard \nBank Account For \nCouples, '
-                                  'Groups, & \nProjects! ',
+                              'Groups, & \nProjects! ',
                               style: poppinsRegular.copyWith(
                                 fontSize: 24.0,
                                 color: AppColors.whiteColor,
@@ -165,54 +165,55 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                         child: CustomGradientButton(
                           btnText: 'Get Started',
                           onTap: () {
-                            Get.to(SignupScreen());
+                            prefs.setBool('showOnboardingScreen', false);
+                            Get.off(const SignupScreen());
                           },
                         ),
                       ),
                     ),
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {},
-                        borderRadius: BorderRadius.circular(18.0),
-                        child: Ink(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18.0),
-                            border: Border.all(
-                              color: AppColors.whiteColor.withOpacity(0.5),
-                              width: 1.0,
-                            ),
-                          ),
-                          child: Center(
-                            child: SvgPicture.asset(AppIcons.appleIcon),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 20.0),
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {},
-                        borderRadius: BorderRadius.circular(18.0),
-                        child: Ink(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18.0),
-                            border: Border.all(
-                              color: AppColors.whiteColor.withOpacity(0.5),
-                              width: 1.0,
-                            ),
-                          ),
-                          child: Center(
-                            child: SvgPicture.asset(AppIcons.googleIcon),
-                          ),
-                        ),
-                      ),
-                    ),
+                    // Material(
+                    //   color: Colors.transparent,
+                    //   child: InkWell(
+                    //     onTap: () {},
+                    //     borderRadius: BorderRadius.circular(18.0),
+                    //     child: Ink(
+                    //       height: 50,
+                    //       width: 50,
+                    //       decoration: BoxDecoration(
+                    //         borderRadius: BorderRadius.circular(18.0),
+                    //         border: Border.all(
+                    //           color: AppColors.whiteColor.withOpacity(0.5),
+                    //           width: 1.0,
+                    //         ),
+                    //       ),
+                    //       child: Center(
+                    //         child: SvgPicture.asset(AppIcons.appleIcon),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    // const SizedBox(width: 20.0),
+                    // Material(
+                    //   color: Colors.transparent,
+                    //   child: InkWell(
+                    //     onTap: () {},
+                    //     borderRadius: BorderRadius.circular(18.0),
+                    //     child: Ink(
+                    //       height: 50,
+                    //       width: 50,
+                    //       decoration: BoxDecoration(
+                    //         borderRadius: BorderRadius.circular(18.0),
+                    //         border: Border.all(
+                    //           color: AppColors.whiteColor.withOpacity(0.5),
+                    //           width: 1.0,
+                    //         ),
+                    //       ),
+                    //       child: Center(
+                    //         child: SvgPicture.asset(AppIcons.googleIcon),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

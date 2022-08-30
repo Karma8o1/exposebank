@@ -1,4 +1,6 @@
 import 'package:expose_banq/const/exports.dart';
+import 'package:expose_banq/main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -103,7 +105,26 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
 
                 MenuButtonWidget(
-                  onTap: () {},
+                  onTap: () {
+                    setState(() {
+                      if (lang) {
+                        lang = !lang;
+                        prefs.setBool('lang', !lang);
+                        Get.updateLocale(const Locale('fr', 'FR'));
+                      } else {
+                        lang = !lang;
+                        prefs.setBool('lang', !lang);
+                        Get.updateLocale(const Locale('en', 'Us'));
+                      }
+                      Get.snackbar(
+                        'change'.tr,
+                        'language'.tr,
+                        backgroundColor: Colors.white,
+                        margin: const EdgeInsets.all(0),
+                        borderRadius: 0,
+                      );
+                    });
+                  },
                   text: 'Change Language',
                   iconPath: AppIcons.languageIcon,
                 ),
@@ -153,7 +174,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 /// Logout Button
                 MenuButtonWidget(
                   onTap: () {
-
+                    FirebaseAuth.instance.signOut();
                   },
                   text: 'Logout',
                   textColor: AppColors.redDarkColor,

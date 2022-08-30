@@ -2,6 +2,7 @@ import 'package:expose_banq/view/approval_request_page/approval_request_screen.d
 import 'package:expose_banq/view/home/components/open_account_button.dart';
 import 'package:expose_banq/view/home/open_account_screen.dart';
 import 'package:expose_banq/widgets/fade_animation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -95,8 +96,8 @@ class _HomeScreenState extends State<HomeScreen> {
               curve: Curves.fastLinearToSlowEaseIn,
               delay: 1.0,
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 5.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -118,7 +119,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     const Spacer(),
                     IconButton(
                       onPressed: () {
-                        Get.to(ApprovalRequestScreen());
+                        // Get.to(const ApprovalRequestScreen());
+                        print(FirebaseAuth.instance.currentUser.toString());
                       },
                       icon: Stack(
                         children: [
@@ -138,7 +140,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: AppColors.redDarkColor,
                               ),
                               child: Center(
-                                child: Text('2',
+                                child: Text(
+                                  '2',
                                   style: poppinsLight.copyWith(
                                     fontSize: 8.0,
                                     color: AppColors.whiteColor,

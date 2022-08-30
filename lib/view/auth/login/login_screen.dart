@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: usernameOrPhoneController,
                     hintText: 'username or phone number',
                     inputFormatter: [
-                      MaskedInputFormatter('0000-0000000'),
+                      MaskedInputFormatter('00000-0000000'),
                     ],
                   ),
                 ),
