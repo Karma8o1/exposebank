@@ -13,11 +13,7 @@ class KYCScreen extends StatefulWidget {
       required this.userName})
       : super(key: key);
   String email, phoneNumber, userName, pin;
-// phoneNumber: phoneNumberController.text.trim(),
-  //     firstName: firstNameController.text.trim(),
-  //     email: emailController.text.trim(),
-  //     username: usernameController.text.trim(),
-  //     pinCode: pinCodeController.text.trim(),
+
   @override
   State<KYCScreen> createState() => _KYCScreenState();
 }
@@ -123,6 +119,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: firstNameController,
                 hintText: 'First Name',
@@ -135,6 +132,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: lastNameController,
                 hintText: 'Last Name',
@@ -147,6 +145,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: dateOfBirthController,
                 hintText: 'Date Of Birth',
@@ -159,6 +158,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: placeOfBirthController,
                 hintText: 'Place Of Birth',
@@ -170,6 +170,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: sexController,
                 hintText: 'Sex',
@@ -181,6 +182,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: nationalityController,
                 hintText: 'Nationality',
@@ -192,6 +194,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: martialStatusController,
                 hintText: 'Martial Status',
@@ -203,6 +206,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: fatherFirstNameController,
                 hintText: 'Father’s first name',
@@ -215,6 +219,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: fatherLastNameController,
                 hintText: 'Father’s last name',
@@ -227,6 +232,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: motherFirstNameController,
                 hintText: 'Mother’s first name',
@@ -239,6 +245,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: motherLastNameController,
                 hintText: 'Mother’s last name',
@@ -250,8 +257,9 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
-                controller: motherLastNameController,
+                controller: nationCardNumberController,
                 hintText:
                     'National identity card number or Passport number or birth certificate number',
                 keyboardType: TextInputType.number,
@@ -263,6 +271,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: nicOrPassportIssueDateController,
                 hintText: 'NIC or passport issue date',
@@ -275,6 +284,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: nicOrPassportExpiryDateController,
                 hintText: 'NIC or passport expiry date',
@@ -287,6 +297,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: professionController,
                 hintText: 'Profession',
@@ -298,6 +309,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: taxNumberController,
                 hintText: 'Tax Number',
@@ -310,6 +322,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: countryOfResidenceController,
                 hintText: 'Country of residence',
@@ -321,6 +334,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: regionOrProvinceController,
                 hintText: 'Region or province',
@@ -332,6 +346,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: townController,
                 hintText: 'Town',
@@ -343,6 +358,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: quarterController,
                 hintText: 'Quarter',
@@ -354,6 +370,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: houseNameController,
                 hintText: 'House name',
@@ -365,6 +382,7 @@ class _KYCScreenState extends State<KYCScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: CustomTextField(
+                validator: (value) {},
                 radius: 8.0,
                 controller: houseNumberController,
                 hintText: 'House number',
@@ -373,20 +391,22 @@ class _KYCScreenState extends State<KYCScreen> {
             ),
 
             /// passport size photo
-            Container(
-              margin:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-              height: height(context) * 0.2,
-              width: width(context),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                color: AppColors.whiteColor,
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.camera_alt,
-                  color: AppColors.blackColor,
-                  size: 40.0,
+            InkWell(
+              child: Container(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                height: height(context) * 0.2,
+                width: width(context),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: AppColors.whiteColor,
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.camera_alt,
+                    color: AppColors.blackColor,
+                    size: 40.0,
+                  ),
                 ),
               ),
             ),
@@ -404,20 +424,22 @@ class _KYCScreenState extends State<KYCScreen> {
             ),
 
             /// national id card front photo
-            Container(
-              margin:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-              height: height(context) * 0.2,
-              width: width(context),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                color: AppColors.whiteColor,
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.camera_alt,
-                  color: AppColors.blackColor,
-                  size: 40.0,
+            InkWell(
+              child: Container(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                height: height(context) * 0.2,
+                width: width(context),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: AppColors.whiteColor,
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.camera_alt,
+                    color: AppColors.blackColor,
+                    size: 40.0,
+                  ),
                 ),
               ),
             ),
@@ -434,20 +456,22 @@ class _KYCScreenState extends State<KYCScreen> {
             ),
 
             /// national id card back photo
-            Container(
-              margin:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-              height: height(context) * 0.2,
-              width: width(context),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                color: AppColors.whiteColor,
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.camera_alt,
-                  color: AppColors.blackColor,
-                  size: 40.0,
+            InkWell(
+              child: Container(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                height: height(context) * 0.2,
+                width: width(context),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: AppColors.whiteColor,
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.camera_alt,
+                    color: AppColors.blackColor,
+                    size: 40.0,
+                  ),
                 ),
               ),
             ),

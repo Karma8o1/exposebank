@@ -10,7 +10,7 @@ class CustomTextField extends StatelessWidget {
   final double? radius;
   final List<TextInputFormatter>? inputFormatter;
   final bool obscure;
-  final Function? validator;
+  final String? Function(String?) validator;
 
   const CustomTextField({
     Key? key,
@@ -20,7 +20,7 @@ class CustomTextField extends StatelessWidget {
     this.radius = 20.0,
     this.inputFormatter,
     this.obscure = false,
-    this.validator,
+    required this.validator,
   }) : super(key: key);
 
   @override
@@ -41,6 +41,7 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         keyboardType: keyboardType,
         inputFormatters: inputFormatter,
+        validator: validator,
         decoration: InputDecoration(
           border: InputBorder.none,
           contentPadding: const EdgeInsets.only(left: 24.0),
@@ -52,5 +53,9 @@ class CustomTextField extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String? validation(String? s) {
+    return s;
   }
 }

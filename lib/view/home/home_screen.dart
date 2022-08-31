@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expose_banq/view/approval_request_page/approval_request_screen.dart';
 import 'package:expose_banq/view/home/components/open_account_button.dart';
 import 'package:expose_banq/view/home/open_account_screen.dart';
@@ -109,18 +110,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: AppColors.blackColor,
                       ),
                     ),
-                    Text(
-                      ' [firstname]',
-                      style: poppinsRegular.copyWith(
-                        fontSize: 12.0,
-                        color: AppColors.greyColor,
-                      ),
-                    ),
+                    FutureBuilder(
+                        future: FirebaseFirestore.instance
+                            .collection('userData')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .get(),
+                        builder: (context,
+                            AsyncSnapshot<DocumentSnapshot> snapshot) {
+                          if (snapshot.hasData) {
+                            return Text(snapshot.data!['firstName']);
+                          } else {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1,
+                              ),
+                            );
+                          }
+                        }),
                     const Spacer(),
                     IconButton(
                       onPressed: () {
-                        // Get.to(const ApprovalRequestScreen());
-                        print(FirebaseAuth.instance.currentUser.toString());
+                        Get.to(const ApprovalRequestScreen());
                       },
                       icon: Stack(
                         children: [

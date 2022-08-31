@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../const/exports.dart';
@@ -27,19 +29,29 @@ class BankCardWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-
           /// bank username and account name texts
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('[Bank username]',
-                style: poppinsLight.copyWith(
-                  fontSize: 12.0,
-                  color: AppColors.greyColor,
-                ),
-              ),
-              Text('Account name',
+              FutureBuilder(
+                  future: FirebaseFirestore.instance
+                      .collection('userData')
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .get(),
+                  builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.hasData) {
+                      return Text(snapshot.data!['userName']);
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1,
+                        ),
+                      );
+                    }
+                  }),
+              Text(
+                'Account name',
                 style: poppinsLight.copyWith(
                   fontSize: 12.0,
                   color: AppColors.greyColor,
@@ -50,7 +62,8 @@ class BankCardWidget extends StatelessWidget {
 
           /// balance texts
           SizedBox(height: height(context) * 0.05),
-          Text('Balance',
+          Text(
+            'Balance',
             style: poppinsMedium.copyWith(
               fontSize: 15.0,
               color: AppColors.whiteColor,
@@ -59,7 +72,8 @@ class BankCardWidget extends StatelessWidget {
 
           /// amount texts
           SizedBox(height: height(context) * 0.016),
-          Text('XAF 7,630,255',
+          Text(
+            'XAF 7,630,255',
             style: poppinsMedium.copyWith(
               fontSize: 30.0,
               color: AppColors.whiteColor,
@@ -72,13 +86,15 @@ class BankCardWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('12022 0149',
+              Text(
+                '12022 0149',
                 style: poppinsLight.copyWith(
                   fontSize: 14.0,
                   color: AppColors.whiteColor,
                 ),
               ),
-              Text('05/25',
+              Text(
+                '05/25',
                 style: poppinsLight.copyWith(
                   fontSize: 14.0,
                   color: AppColors.whiteColor,

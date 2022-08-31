@@ -7,9 +7,9 @@ void showLoading(BuildContext context) {
       context: context,
       builder: (context) {
         return WillPopScope(
-            child: AlertDialog(
+            child: const AlertDialog(
               backgroundColor: Colors.transparent,
-              content: SpinKitCubeGrid(color: Colors.blueGrey[600]),
+              content: SpinKitWave(color: Colors.white),
             ),
             onWillPop: () async {
               return false;

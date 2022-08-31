@@ -1,12 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:elegant_notification/resources/arrays.dart';
+import 'package:expose_banq/const/loading.dart';
 import 'package:expose_banq/models/UserModel/user.dart';
+import 'package:expose_banq/view/auth/pin/login_pin.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+late String imageUrl;
 
 class AuthController {
   final auth.FirebaseAuth _fbAuth = auth.FirebaseAuth.instance;
@@ -21,6 +28,73 @@ class AuthController {
     return _fbAuth.authStateChanges().map(_userFromFirebase);
   }
 
+  static Future<void> signInUser({
+    required String phoneNumber,
+    required String pinCode,
+    required BuildContext context,
+  }) async {
+    FirebaseFirestore.instance
+        .collection('userData')
+        .where('phoneNumber', isEqualTo: phoneNumber)
+        .limit(1)
+        .get()
+        .then((value) {
+      showLoading(context);
+      if (value.docs[0]['pinCode'] == pinCode) {
+        auth.FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: phoneNumber,
+          verificationCompleted: (auth.PhoneAuthCredential credential) async {
+            await auth.FirebaseAuth.instance.signInWithCredential(credential);
+          },
+          verificationFailed: (auth.FirebaseAuthException e) {
+            Get.back();
+            ElegantNotification.error(
+              title: const Text('Failed to send code'),
+              description: Text(e.message.toString()),
+              notificationPosition: NotificationPosition.bottom,
+              dismissible: true,
+              autoDismiss: true,
+              animationDuration: const Duration(seconds: 2),
+              height: 70,
+              width: MediaQuery.of(context).size.width - 50,
+            ).show(context);
+          },
+          codeSent: (String verificationId, int? resendToken) {
+            Get.back();
+            showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(0)),
+                      ),
+                      insetPadding: EdgeInsets.zero,
+                      contentPadding: EdgeInsets.zero,
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      content: SizedBox(
+                        height: MediaQuery.of(context).size.height,
+                        width: MediaQuery.of(context).size.width,
+                        child: LoginPinScreen(
+                          verificationId: verificationId,
+                          //this makes sure the user sign in does not mess with user data
+                          storeData: false,
+                        ),
+                      ));
+                });
+          },
+          codeAutoRetrievalTimeout: (String verificationId) {},
+        );
+      } else {
+        ElegantNotification.error(
+          title: const Text('Error'),
+          description: const Text('Pin Code does not match'),
+        ).show(context);
+        return;
+      }
+    });
+  }
+
   static Future<void> registerUser({
     required String phoneNumber,
     required String firstName,
@@ -32,6 +106,7 @@ class AuthController {
     await auth.FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (auth.PhoneAuthCredential credential) async {
+        Get.back();
         await auth.FirebaseAuth.instance.signInWithCredential(credential);
       },
       verificationFailed: (auth.FirebaseAuthException e) {
@@ -52,42 +127,27 @@ class AuthController {
         showDialog(
             context: context,
             builder: (context) {
-              return StatefulBuilder(builder: ((context, setState) {
-                return AlertDialog(
-                  content: OtpTextField(
-                    numberOfFields: 6,
-                    borderColor: const Color(0xFF512DA8),
-                    //set to true to show as box or false to show as dash
-                    showFieldAsBox: true,
-                    //runs when a code is typed in
-                    onCodeChanged: (String code) {
-                      //handle validation or checks here
-                    },
-                    //runs when every textfield is filled
-                    onSubmit: (String verificationCode) async {
-                      // Create a PhoneAuthCredential with the code
-                      auth.PhoneAuthCredential credential =
-                          auth.PhoneAuthProvider.credential(
-                              verificationId: verificationId,
-                              smsCode: verificationCode);
-
-                      // Sign the user in (or link) with the credential
-                      await auth.FirebaseAuth.instance
-                          .signInWithCredential(credential);
-                      FirebaseFirestore.instance
-                          .collection('userData')
-                          .doc()
-                          .set({
-                        'firstName': firstName,
-                        'emailAddress': email,
-                        'phoneNumber': phoneNumber,
-                        'userName': username,
-                        'pinCode': pinCode,
-                      });
-                    }, // end onSubmit
+              return AlertDialog(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(0)),
                   ),
-                );
-              }));
+                  insetPadding: EdgeInsets.zero,
+                  contentPadding: EdgeInsets.zero,
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  content: SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    child: LoginPinScreen(
+                      verificationId: verificationId,
+                      //this stores data to firestore upon registration
+                      storeData: true,
+                      email: email,
+                      firstName: firstName,
+                      pinCode: pinCode,
+                      phoneNumber: phoneNumber,
+                      username: username,
+                    ),
+                  ));
             });
       },
       codeAutoRetrievalTimeout: (String verificationId) {},

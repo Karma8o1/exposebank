@@ -1,4 +1,5 @@
 import 'package:expose_banq/const/exports.dart';
+import 'package:expose_banq/controllers/authController.dart';
 import 'package:expose_banq/view/auth/pin/login_pin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +17,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController usernameOrPhoneController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
   TextEditingController pinCodeController = TextEditingController();
 
   @override
@@ -58,11 +59,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
                   child: CustomTextField(
-                    controller: usernameOrPhoneController,
-                    hintText: 'username or phone number',
+                    controller: phoneController,
+                    hintText: 'phoneno'.tr,
+                    keyboardType: TextInputType.phone,
                     inputFormatter: [
-                      MaskedInputFormatter('00000-0000000'),
+                      FilteringTextInputFormatter.allow(RegExp(r'[+,0-9]')),
                     ],
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter mobile number';
+                      }
+                      if (value.toString().length < 11 ||
+                          !value.toString().contains('+')) {
+                        return 'Please enter valid mobile number';
+                      }
+                      return null;
+                    },
                   ),
                 ),
 
@@ -74,6 +86,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: pinCodeController,
                     hintText: 'Pin Code',
                     keyboardType: TextInputType.number,
+                    obscure: true,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter pin code';
+                      }
+                      if (value.toString().length < 4) {
+                        return 'Please enter valid mobile number';
+                      }
+                      return null;
+                    },
                     inputFormatter: [
                       FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                       MaskedInputFormatter('00000'),
@@ -109,7 +131,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: CustomGradientButton(
                     btnText: 'Login',
                     onTap: () {
-                      Get.to(const LoginPinScreen());
+                      AuthController.signInUser(
+                        phoneNumber: phoneController.text,
+                        pinCode: pinCodeController.text,
+                        context: context,
+                      );
                     },
                   ),
                 ),

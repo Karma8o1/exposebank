@@ -125,6 +125,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       controller: firstNameController,
                       hintText: 'name'.tr,
                       keyboardType: TextInputType.name,
+                      validator: (value) {},
                     ),
                   ),
 
@@ -136,6 +137,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       controller: emailController,
                       hintText: 'email'.tr,
                       keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (!GetUtils.isEmail(value.toString())) {
+                          return 'Please enter a valid email';
+                        }
+                      },
                     ),
                   ),
 
@@ -150,6 +156,15 @@ class _SignupScreenState extends State<SignupScreen> {
                       inputFormatter: [
                         FilteringTextInputFormatter.allow(RegExp(r'[+,0-9]')),
                       ],
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter mobile number';
+                        }
+                        if (value.toString().length < 11 ||
+                            !value.toString().contains('+')) {
+                          return 'Please enter valid mobile number';
+                        }
+                      },
                     ),
                   ),
 
@@ -161,6 +176,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       controller: usernameController,
                       hintText: 'username'.tr,
                       keyboardType: TextInputType.name,
+                      validator: (value) {},
                     ),
                   ),
 
@@ -173,6 +189,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       hintText: 'pin'.tr,
                       keyboardType: TextInputType.number,
                       obscure: true,
+                      validator: (value) {},
                     ),
                   ),
 
@@ -185,25 +202,29 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: CustomGradientButton(
                       btnText: 'Enter',
                       onTap: () async {
-                        //information drilled to KYC form so the regsitration could be done after
-                        //KYC form is filled
-                        Get.to(KYCScreen(
-                            email: emailController.text,
-                            phoneNumber: phoneNumberController.text,
-                            pin: pinCodeController.text,
-                            userName: usernameController.text));
-                        //registers user to firebase and stores the collected data.
-                        // if (_formKey.currentState!.validate()) {
-                        //   showLoading(context);
-                        //   AuthController.registerUser(
-                        //     phoneNumber: phoneNumberController.text.trim(),
-                        //     firstName: firstNameController.text.trim(),
-                        //     email: emailController.text.trim(),
-                        //     username: usernameController.text.trim(),
-                        //     pinCode: pinCodeController.text.trim(),
-                        //     context: context,
-                        //   );
-                        // }
+                        if (_formKey.currentState!.validate()) {
+                          // Get.to(KYCScreen(
+                          //   email: emailController.text,
+                          //   phoneNumber: phoneNumberController.text,
+                          //   pin: pinCodeController.text,
+                          //   userName: usernameController.text,
+                          // ));
+                          //information drilled to KYC form so the regsitration could be done after
+                          //KYC form is filled
+
+                          //registers user to firebase and stores the collected data.
+                          if (_formKey.currentState!.validate()) {
+                            showLoading(context);
+                            AuthController.registerUser(
+                              phoneNumber: phoneNumberController.text.trim(),
+                              firstName: firstNameController.text.trim(),
+                              email: emailController.text.trim(),
+                              username: usernameController.text.trim(),
+                              pinCode: pinCodeController.text.trim(),
+                              context: context,
+                            );
+                          }
+                        }
                       },
                     ),
                   ),

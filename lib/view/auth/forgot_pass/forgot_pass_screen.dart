@@ -10,7 +10,6 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController motherNameController = TextEditingController();
 
@@ -18,7 +17,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.blackColor,
-
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0.0,
@@ -26,7 +24,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           color: AppColors.whiteColor,
         ),
       ),
-
       body: SizedBox(
         height: height(context),
         width: width(context),
@@ -37,7 +34,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
                 /// app name
                 SizedBox(height: height(context) * 0.15),
                 Row(
@@ -65,6 +61,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: CustomTextField(
                     controller: phoneNumberController,
                     hintText: 'Enter phone number',
+                    validator: (value) {},
                   ),
                 ),
 
@@ -76,6 +73,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     controller: motherNameController,
                     hintText: 'Your Mother’s Full name',
                     keyboardType: TextInputType.name,
+                    validator: (value) {},
                   ),
                 ),
 
