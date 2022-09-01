@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:expose_banq/const/exports.dart';
 import 'package:expose_banq/const/loading.dart';
 import 'package:expose_banq/controllers/authController.dart';
