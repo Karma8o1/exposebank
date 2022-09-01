@@ -1,14 +1,14 @@
+import 'package:expose_banq/view/wrapper/wrapper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:elegant_notification/resources/arrays.dart';
 import 'package:expose_banq/const/loading.dart';
 import 'package:expose_banq/models/UserModel/user.dart';
 import 'package:expose_banq/view/auth/pin/login_pin.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
-import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -45,6 +45,7 @@ class AuthController {
           phoneNumber: phoneNumber,
           verificationCompleted: (auth.PhoneAuthCredential credential) async {
             await auth.FirebaseAuth.instance.signInWithCredential(credential);
+            Get.off(const Wrapper());
           },
           verificationFailed: (auth.FirebaseAuthException e) {
             Get.back();
@@ -54,8 +55,8 @@ class AuthController {
               notificationPosition: NotificationPosition.bottom,
               dismissible: true,
               autoDismiss: true,
-              animationDuration: const Duration(seconds: 2),
-              height: 70,
+              animationDuration: const Duration(seconds: 5),
+              height: 100,
               width: MediaQuery.of(context).size.width - 50,
             ).show(context);
           },
@@ -86,9 +87,11 @@ class AuthController {
           codeAutoRetrievalTimeout: (String verificationId) {},
         );
       } else {
+        Get.back();
         ElegantNotification.error(
           title: const Text('Error'),
           description: const Text('Pin Code does not match'),
+          toastDuration: const Duration(seconds: 5),
         ).show(context);
         return;
       }
@@ -107,7 +110,20 @@ class AuthController {
       phoneNumber: phoneNumber,
       verificationCompleted: (auth.PhoneAuthCredential credential) async {
         Get.back();
-        await auth.FirebaseAuth.instance.signInWithCredential(credential);
+        await auth.FirebaseAuth.instance
+            .signInWithCredential(credential)
+            .then((value) async {
+          await FirebaseFirestore.instance
+              .collection('userData')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .set({
+            'firstName': firstName,
+            'emailAddress': email,
+            'phoneNumber': phoneNumber,
+            'userName': username,
+            'pinCode': pinCode,
+          }).then((value) => Get.off(const Wrapper()));
+        });
       },
       verificationFailed: (auth.FirebaseAuthException e) {
         Get.back();

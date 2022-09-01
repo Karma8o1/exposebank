@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expose_banq/view/wrapper/wrapper.dart';
 import 'package:expose_banq/widgets/lib/src/flutter_pin_code_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -110,26 +111,31 @@ class _LoginPinScreenState extends State<LoginPinScreen> {
                   PhoneAuthCredential credential = PhoneAuthProvider.credential(
                       verificationId: widget.verificationId,
                       smsCode: value.toString());
+                  try {
+                    await FirebaseAuth.instance
+                        .signInWithCredential(credential)
+                        .then((value) async {
+                      //stores data to firestore database entered by user
+                      widget.storeData
+                          ? await FirebaseFirestore.instance
+                              .collection('userData')
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .set({
+                              'firstName': widget.firstName,
+                              'emailAddress': widget.email,
+                              'phoneNumber': widget.phoneNumber,
+                              'userName': widget.username,
+                              'pinCode': widget.pinCode,
+                            }).then((value) {
+                              Get.off(const Wrapper());
+                            })
+                          : ({Get.off(const Wrapper())});
+                    });
+                  } catch (e) {
+                    print(e.toString());
+                  }
 
                   // Sign the user in (or link) with the credential
-                  Get.back();
-                  await FirebaseAuth.instance
-                      .signInWithCredential(credential)
-                      .then((value) async {
-                    //stores data to firestore database entered by user
-                    widget.storeData
-                        ? FirebaseFirestore.instance
-                            .collection('userData')
-                            .doc(FirebaseAuth.instance.currentUser!.uid)
-                            .set({
-                            'firstName': widget.firstName,
-                            'emailAddress': widget.email,
-                            'phoneNumber': widget.phoneNumber,
-                            'userName': widget.username,
-                            'pinCode': widget.pinCode,
-                          })
-                        : null;
-                  });
                 },
                 initialPinLength: 6,
                 onChangedPin: (_) {},
