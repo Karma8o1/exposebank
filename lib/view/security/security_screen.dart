@@ -16,7 +16,6 @@ class SecurityScreen extends StatefulWidget {
 }
 
 class _SecurityScreenState extends State<SecurityScreen> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,7 +72,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 emptyIndicatorColor: AppColors.blackLightColor,
                 filledIndicatorColor: AppColors.parrotColor,
                 leftBottomWidget: GestureDetector(
-                  onTap: (){
+                  onTap: () {
                     Get.to(VerificationScreen());
                   },
                   child: Container(
@@ -106,7 +105,6 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 ),
               ),
             ),
-
             SizedBox(height: height(context) * 0.04),
           ],
         ),

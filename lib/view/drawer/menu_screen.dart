@@ -61,24 +61,34 @@ class _MenuScreenState extends State<MenuScreen> {
 
                 /// user name
                 const SizedBox(height: 16.0),
-                Text(
-                  'Jeniffer Winget',
-                  style: poppinsLight.copyWith(
-                    fontSize: 18.0,
-                    color: AppColors.whiteColor,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
+                FutureBuilder(builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData && snapshot.data != null) {
+                    return Column(
+                      children: [
+                        Text(
+                          snapshot.data['firstName'],
+                          style: poppinsLight.copyWith(
+                            fontSize: 18.0,
+                            color: AppColors.whiteColor,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
 
-                /// user number and email
-                const SizedBox(height: 8.0),
-                Text(
-                  '+91 123412349 jenny@gmail.com',
-                  style: poppinsLight.copyWith(
-                    fontSize: 12.0,
-                    color: AppColors.whiteColor,
-                  ),
-                ),
+                        /// user number and email
+                        const SizedBox(height: 8.0),
+                        Text(
+                          '${snapshot.data['phoneNumber']} ${snapshot.data['emailAddress']}',
+                          style: poppinsLight.copyWith(
+                            fontSize: 12.0,
+                            color: AppColors.whiteColor,
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return const Text('Loading.....');
+                  }
+                }),
 
                 SizedBox(height: height(context) * 0.02),
                 MenuButtonWidget(

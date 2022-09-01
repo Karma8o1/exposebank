@@ -203,27 +203,27 @@ class _SignupScreenState extends State<SignupScreen> {
                       btnText: 'Enter',
                       onTap: () async {
                         if (_formKey.currentState!.validate()) {
-                          // Get.to(KYCScreen(
-                          //   email: emailController.text,
-                          //   phoneNumber: phoneNumberController.text,
-                          //   pin: pinCodeController.text,
-                          //   userName: usernameController.text,
-                          // ));
+                          Get.to(KYCScreen(
+                            email: emailController.text,
+                            phoneNumber: phoneNumberController.text,
+                            pin: pinCodeController.text,
+                            userName: usernameController.text,
+                          ));
                           //information drilled to KYC form so the regsitration could be done after
                           //KYC form is filled
 
                           //registers user to firebase and stores the collected data.
-                          if (_formKey.currentState!.validate()) {
-                            showLoading(context);
-                            AuthController.registerUser(
-                              phoneNumber: phoneNumberController.text.trim(),
-                              firstName: firstNameController.text.trim(),
-                              email: emailController.text.trim(),
-                              username: usernameController.text.trim(),
-                              pinCode: pinCodeController.text.trim(),
-                              context: context,
-                            );
-                          }
+                          // if (_formKey.currentState!.validate()) {
+                          //   showLoading(context);
+                          //   AuthController.registerUser(
+                          //     phoneNumber: phoneNumberController.text.trim(),
+                          //     firstName: firstNameController.text.trim(),
+                          //     email: emailController.text.trim(),
+                          //     username: usernameController.text.trim(),
+                          //     pinCode: pinCodeController.text.trim(),
+                          //     context: context,
+                          //   );
+                          // }
                         }
                       },
                     ),
