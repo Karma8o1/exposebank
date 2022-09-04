@@ -95,14 +95,14 @@ class _MenuScreenState extends State<MenuScreen> {
                   onTap: () {
                     Get.offAll(const DrawerScreen());
                   },
-                  text: 'Home',
+                  text: 'home'.tr,
                   iconPath: AppIcons.homeIcon,
                 ),
                 MenuButtonWidget(
                   onTap: () {
                     Get.to(const VerifiedAccountsScreen());
                   },
-                  text: 'Bank Accounts',
+                  text: 'Bank Account'.tr,
                   iconPath: AppIcons.bankAccountsIcon,
                 ),
 
@@ -110,7 +110,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   onTap: () {
                     Get.to(const SendMoneyScreen());
                   },
-                  text: 'Send Money',
+                  text: 'Send Money'.tr,
                   iconPath: AppIcons.sendMoneyIcon,
                 ),
 
@@ -135,14 +135,14 @@ class _MenuScreenState extends State<MenuScreen> {
                       );
                     });
                   },
-                  text: 'Change Language',
+                  text: 'Change Language'.tr,
                   iconPath: AppIcons.languageIcon,
                 ),
                 MenuButtonWidget(
                   onTap: () {
                     Get.to(const ContactUsScreen());
                   },
-                  text: 'Contact Us',
+                  text: 'Contact Us'.tr,
                   iconPath: AppIcons.chatIcon,
                 ),
 
@@ -150,7 +150,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   onTap: () {
                     Get.to(const FaqsScreen());
                   },
-                  text: 'FAQs',
+                  text: 'FAQs'.tr,
                   iconPath: AppIcons.faqsIcon,
                 ),
 
@@ -159,7 +159,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   onTap: () {
                     Get.to(const AboutUsScreen());
                   },
-                  text: 'About Us',
+                  text: 'About Us'.tr,
                   iconPath: AppIcons.aboutIcon,
                 ),
 
@@ -168,7 +168,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   onTap: () {
                     Get.to(const TermsAndConditionScreen());
                   },
-                  text: 'Terms And Conditions',
+                  text: 'T&C'.tr,
                   iconPath: AppIcons.notificationIcon,
                 ),
 
@@ -177,7 +177,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   onTap: () {
                     Get.to(const PrivacyPolicyScreen());
                   },
-                  text: 'Privacy & Policy',
+                  text: 'P&P'.tr,
                   iconPath: AppIcons.privacyIcon,
                 ),
 
@@ -186,7 +186,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   onTap: () {
                     FirebaseAuth.instance.signOut();
                   },
-                  text: 'Logout',
+                  text: 'Logout'.tr,
                   textColor: AppColors.redDarkColor,
                   iconPath: AppIcons.logoutIcon,
                   iconColor: AppColors.redDarkColor,

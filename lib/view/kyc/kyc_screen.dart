@@ -1,10 +1,26 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, unnecessary_null_comparison
 
+import 'dart:io';
+
+import 'package:camera/camera.dart';
+import 'package:elegant_notification/elegant_notification.dart';
 import 'package:expose_banq/const/exports.dart';
 import 'package:expose_banq/const/loading.dart';
+import 'package:expose_banq/controllers/StorageController/storageController.dart';
 import 'package:expose_banq/controllers/authController.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:file_picker/file_picker.dart';
+
+String? profileImage = '', cnicFront = '', cnicBack = '';
+final storageRef = FirebaseStorage.instance.ref();
+// final cnicStorageRef = FirebaseStorage.instanceFor(
+//     bucket: "gs://expose-banq.appspot.com/cnicPictures");
+// final profileStorageRef = FirebaseStorage.instanceFor(
+//     bucket: 'gs://expose-banq.appspot.com/profilePictures');
 
 class KYCScreen extends StatefulWidget {
   KYCScreen({
@@ -29,9 +45,6 @@ class _KYCScreenState extends State<KYCScreen> {
   TextEditingController sexController = TextEditingController();
   TextEditingController nationalityController = TextEditingController();
   TextEditingController martialStatusController = TextEditingController();
-  TextEditingController fatherFirstNameController = TextEditingController();
-  TextEditingController fatherLastNameController = TextEditingController();
-  TextEditingController motherFirstNameController = TextEditingController();
   TextEditingController motherLastNameController = TextEditingController();
   TextEditingController nationCardNumberController = TextEditingController();
   TextEditingController nicOrPassportIssueDateController =
@@ -43,9 +56,6 @@ class _KYCScreenState extends State<KYCScreen> {
   TextEditingController countryOfResidenceController = TextEditingController();
   TextEditingController regionOrProvinceController = TextEditingController();
   TextEditingController townController = TextEditingController();
-  TextEditingController quarterController = TextEditingController();
-  TextEditingController houseNameController = TextEditingController();
-  TextEditingController houseNumberController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -248,63 +258,6 @@ class _KYCScreenState extends State<KYCScreen> {
                 ),
               ),
 
-              /// Father’s first name field
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                child: CustomTextField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field cannot be empty.';
-                    } else {
-                      return null;
-                    }
-                  },
-                  radius: 8.0,
-                  controller: fatherFirstNameController,
-                  hintText: 'Father’s first name',
-                  keyboardType: TextInputType.name,
-                ),
-              ),
-
-              /// Father’s last name field
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                child: CustomTextField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field cannot be empty.';
-                    } else {
-                      return null;
-                    }
-                  },
-                  radius: 8.0,
-                  controller: fatherLastNameController,
-                  hintText: 'Father’s last name',
-                  keyboardType: TextInputType.name,
-                ),
-              ),
-
-              /// Mother first name field
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                child: CustomTextField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field cannot be empty.';
-                    } else {
-                      return null;
-                    }
-                  },
-                  radius: 8.0,
-                  controller: motherFirstNameController,
-                  hintText: 'Mother’s first name',
-                  keyboardType: TextInputType.name,
-                ),
-              ),
-
               /// Mother last name field
               Padding(
                 padding:
@@ -472,80 +425,141 @@ class _KYCScreenState extends State<KYCScreen> {
                 ),
               ),
 
-              /// Quarter field
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                child: CustomTextField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field cannot be empty.';
-                    } else {
-                      return null;
-                    }
-                  },
-                  radius: 8.0,
-                  controller: quarterController,
-                  hintText: 'Quarter',
-                ),
-              ),
-
-              /// House name field
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                child: CustomTextField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field cannot be empty.';
-                    } else {
-                      return null;
-                    }
-                  },
-                  radius: 8.0,
-                  controller: houseNameController,
-                  hintText: 'House name',
-                ),
-              ),
-
-              /// House number field
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                child: CustomTextField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field cannot be empty.';
-                    } else {
-                      return null;
-                    }
-                  },
-                  radius: 8.0,
-                  controller: houseNumberController,
-                  hintText: 'House number',
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-
               /// passport size photo
               InkWell(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 8.0),
-                  height: height(context) * 0.2,
-                  width: width(context),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    color: AppColors.whiteColor,
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.camera_alt,
-                      color: AppColors.blackColor,
-                      size: 40.0,
-                    ),
-                  ),
-                ),
+                onTap: () async {
+                  final results = await FilePicker.platform.pickFiles(
+                      allowMultiple: false,
+                      type: FileType.custom,
+                      allowedExtensions: ['png', 'jpg']);
+                  if (results == null) {
+                    ElegantNotification.error(
+                        description: const Text(
+                            'You need to pick an image to continue'));
+                    return;
+                  }
+                  final filePath = results.files.single.path;
+                  final fileName = results.files.single.name;
+                  setState(() async {
+                    profileImage = await StorageController.uploadImage(
+                        fileName: fileName,
+                        filePath: filePath,
+                        bucketAddress: 'profilePictures');
+                  });
+                  // showModalBottomSheet<void>(
+                  //   context: context,
+                  //   backgroundColor: Colors.transparent,
+                  //   builder: (BuildContext context) {
+                  //     return Container(
+                  //       decoration: const BoxDecoration(
+                  //           color: Colors.black87,
+                  //           borderRadius: BorderRadius.only(
+                  //               topLeft: Radius.circular(5),
+                  //               topRight: Radius.circular(5))),
+                  //       height: 200,
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         mainAxisSize: MainAxisSize.min,
+                  //         children: <Widget>[
+                  //           Column(
+                  //             mainAxisAlignment: MainAxisAlignment.center,
+                  //             crossAxisAlignment: CrossAxisAlignment.center,
+                  //             children: [
+                  //               InkWell(
+                  //                 onTap: () {},
+                  //                 child: SizedBox(
+                  //                   height: 50,
+                  //                   width: 50,
+                  //                   child:
+                  //                       Image.asset('assets/images/camera.png'),
+                  //                 ),
+                  //               ),
+                  //               const Text(
+                  //                 'CAMERA',
+                  //                 style: TextStyle(
+                  //                     color: Colors.white,
+                  //                     fontWeight: FontWeight.bold),
+                  //               )
+                  //             ],
+                  //           ),
+                  //           const VerticalDivider(
+                  //             width: 100,
+                  //           ),
+                  //           Column(
+                  //             mainAxisAlignment: MainAxisAlignment.center,
+                  //             crossAxisAlignment: CrossAxisAlignment.center,
+                  //             children: [
+                  //               InkWell(
+                  //                 onTap: () async {
+                  //                   final results = await FilePicker.platform
+                  //                       .pickFiles(
+                  //                           allowMultiple: false,
+                  //                           type: FileType.custom,
+                  //                           allowedExtensions: ['png', 'jpg']);
+                  //                   if (results == null) {
+                  //                     ElegantNotification.error(
+                  //                         description: const Text(
+                  //                             'You need to pick an image to continue'));
+                  //                     return;
+                  //                   }
+                  //                   final filePath = results.files.single.path;
+                  //                   final fileName = results.files.single.name;
+                  //                   setState(() async {
+                  //                     profileImage =
+                  //                         await StorageController.uploadImage(
+                  //                             fileName: fileName,
+                  //                             filePath: filePath,
+                  //                             bucketAddress: 'profilePictures');
+                  //                   });
+                  //                 },
+                  //                 child: SizedBox(
+                  //                   height: 50,
+                  //                   width: 50,
+                  //                   child: Image.asset(
+                  //                       'assets/images/gallery.png'),
+                  //                 ),
+                  //               ),
+                  //               const Text(
+                  //                 'GALLERY',
+                  //                 style: TextStyle(
+                  //                     color: Colors.white,
+                  //                     fontWeight: FontWeight.bold),
+                  //               )
+                  //             ],
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     );
+                  //   },
+                  // );
+                },
+                child: profileImage == null
+                    ? Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 24.0, vertical: 8.0),
+                        height: height(context) * 0.2,
+                        width: width(context),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          color: AppColors.whiteColor,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.camera_alt,
+                            color: AppColors.blackColor,
+                            size: 100.0,
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: CircleAvatar(
+                            backgroundColor: Colors.grey,
+                            radius: 45,
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: Image.network(
+                                    'https://${profileImage as String}'))),
+                      ),
               ),
               Padding(
                 padding:
@@ -562,6 +576,26 @@ class _KYCScreenState extends State<KYCScreen> {
 
               /// national id card front photo
               InkWell(
+                onTap: () async {
+                  final results = await FilePicker.platform.pickFiles(
+                      allowMultiple: false,
+                      type: FileType.custom,
+                      allowedExtensions: ['png', 'jpg']);
+                  if (results == null) {
+                    ElegantNotification.error(
+                        description: const Text(
+                            'You need to pick an image to continue'));
+                    return;
+                  }
+                  final filePath = results.files.single.path;
+                  final fileName = results.files.single.name;
+                  setState(() async {
+                    cnicFront = await StorageController.uploadImage(
+                        fileName: fileName,
+                        filePath: filePath,
+                        bucketAddress: 'cnicPictures');
+                  });
+                },
                 child: Container(
                   margin: const EdgeInsets.symmetric(
                       horizontal: 24.0, vertical: 8.0),
@@ -594,6 +628,26 @@ class _KYCScreenState extends State<KYCScreen> {
 
               /// national id card back photo
               InkWell(
+                onTap: () async {
+                  final results = await FilePicker.platform.pickFiles(
+                      allowMultiple: false,
+                      type: FileType.custom,
+                      allowedExtensions: ['png', 'jpg']);
+                  if (results == null) {
+                    ElegantNotification.error(
+                        description: const Text(
+                            'You need to pick an image to continue'));
+                    return;
+                  }
+                  final filePath = results.files.single.path;
+                  final fileName = results.files.single.name;
+                  setState(() async {
+                    cnicBack = await StorageController.uploadImage(
+                        fileName: fileName,
+                        filePath: filePath,
+                        bucketAddress: 'cnicPictures');
+                  });
+                },
                 child: Container(
                   margin: const EdgeInsets.symmetric(
                       horizontal: 24.0, vertical: 8.0),
@@ -635,7 +689,6 @@ class _KYCScreenState extends State<KYCScreen> {
                   onTap: () {
                     //registers user to firebase and stores the collected data.
                     if (_formKey.currentState!.validate()) {
-                      print('formValidated');
                       showLoading(context);
                       AuthController.registerUser(
                         phoneNumber: widget.phoneNumber,
@@ -649,9 +702,6 @@ class _KYCScreenState extends State<KYCScreen> {
                         sex: sexController.text,
                         nationality: nationalityController.text,
                         martialStatus: martialStatusController.text,
-                        fatherFirstName: fatherFirstNameController.text,
-                        fatherLastName: fatherLastNameController.text,
-                        motherFirstName: motherFirstNameController.text,
                         motherLastName: motherLastNameController.text,
                         nationCardNumber: nationCardNumberController.text,
                         nicOrPassportIssueDate:
@@ -659,14 +709,13 @@ class _KYCScreenState extends State<KYCScreen> {
                         nicOrPassportExpiryDate:
                             nicOrPassportExpiryDateController.text,
                         profession: professionController.text,
-                        taxNumber: taxNumberController.text,
                         countryOfResidence: countryOfResidenceController.text,
                         regionOrProvince: regionOrProvinceController.text,
                         town: townController.text,
-                        quarter: quarterController.text,
-                        houseName: houseNameController.text,
-                        houseNumber: houseNumberController.text,
                         context: context,
+                        cnicBack: cnicBack,
+                        cnicFront: cnicFront,
+                        profile: profileImage,
                       );
                     }
                   },

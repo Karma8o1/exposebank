@@ -311,23 +311,65 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   /// list of transactions
                   const SizedBox(height: 10.0),
-
-                  FadeAnimation(
-                    curve: Curves.ease,
-                    delay: 1.3,
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.only(bottom: 50.0),
-                      itemCount: transTypeTexts.length,
-                      itemBuilder: (context, index) {
-                        return TransactionCardBox(
-                          transactionType: transTypeTexts[index],
-                          moneyColor: textColors[index],
-                        );
-                      },
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('transactions')
+                          .where('userId',
+                              isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                          .snapshots(),
+                      builder:
+                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.hasData &&
+                            snapshot.data!.docs.isNotEmpty) {
+                          return FadeAnimation(
+                            curve: Curves.ease,
+                            delay: 1.3,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              padding: const EdgeInsets.only(bottom: 50.0),
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (context, index) {
+                                return TransactionCardBox(
+                                  transactionType: snapshot.data!.docs[index]
+                                      ['transactionType'],
+                                  moneyColor: snapshot.data!.docs[index]
+                                              ['transactionType'] ==
+                                          'deposit'
+                                      ? Colors.green
+                                      : Colors.red,
+                                );
+                              },
+                            ),
+                          );
+                        }
+                        if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height / 4.8,
+                              child: Center(
+                                child: Text(
+                                  'No Transactions till now',
+                                  style: poppinsRegular.copyWith(
+                                    fontSize: 12.0,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        } else {
+                          return SizedBox(
+                            height: MediaQuery.of(context).size.height / 5,
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ),
+                          );
+                        }
+                      }),
                 ],
               ),
             ),

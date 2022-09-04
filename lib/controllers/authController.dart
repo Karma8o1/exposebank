@@ -1,5 +1,6 @@
 import 'package:expose_banq/view/wrapper/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elegant_notification/elegant_notification.dart';
@@ -10,8 +11,6 @@ import 'package:expose_banq/view/auth/pin/login_pin.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 late String imageUrl;
 
@@ -110,26 +109,25 @@ class AuthController {
     required String sex,
     required String nationality,
     required String martialStatus,
-    required String fatherFirstName,
-    required String fatherLastName,
-    required String motherFirstName,
     required String motherLastName,
     required String nationCardNumber,
     required String nicOrPassportIssueDate,
     required String nicOrPassportExpiryDate,
     required String profession,
-    required String taxNumber,
     required String countryOfResidence,
     required String regionOrProvince,
     required String town,
-    required String quarter,
-    required String houseName,
-    required String houseNumber,
+    required String? profile,
+    required String? cnicFront,
+    required String? cnicBack,
     required context,
   }) async {
     await auth.FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (auth.PhoneAuthCredential credential) async {
+        String? token = await FirebaseMessaging.instance.getToken();
+
+        // Save the initial token to the database
         Get.back();
         await auth.FirebaseAuth.instance
             .signInWithCredential(credential)
@@ -143,28 +141,25 @@ class AuthController {
             'phoneNumber': phoneNumber,
             'userName': username,
             'pinCode': pinCode,
-            'firstName': firstName,
             'lastName': lastName,
             'dateOfBirth': dateOfBirth,
             'placeOfBirth': placeOfBirth,
             'sex': sex,
             'nationality': nationality,
             'martialStatus': martialStatus,
-            'fatherFirstName': fatherFirstName,
-            'fatherLastName': fatherLastName,
-            'motherFirstName': motherFirstName,
             'motherLastName': motherLastName,
             'nationCardNumber': nationCardNumber,
             'nicOrPassportIssueDate': nicOrPassportIssueDate,
             'nicOrPassportExpiryDate': nicOrPassportExpiryDate,
             'profession': profession,
-            'taxNumber': taxNumber,
             'countryOfResidence': countryOfResidence,
             'regionOrProvince': regionOrProvince,
             'townController': town,
-            'quarter': quarter,
-            'houseName': houseName,
-            'houseNumber': houseNumber,
+            'notificationToken': token,
+            //Urls of the images stored in firebase storage
+            'profilePicture': profile,
+            'nicFront': cnicFront,
+            'nicBack': cnicBack,
           }).then((value) => Get.off(const Wrapper()));
         });
       },

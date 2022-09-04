@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@firebase/firestore": "^3.4.15",
+    "@firebase/messaging": "^0.9.16",
+    "twilio": "^3.81.0"
+  }
+}
