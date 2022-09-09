@@ -2,7 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:expose_banq/const/exports.dart';
 import 'package:expose_banq/view/payment_transfer/amount_screen.dart';
 import 'package:expose_banq/view/payment_transfer/verification_screen.dart';
-import 'package:expose_banq/view/security/create_pin.dart';
+import 'package:expose_banq/view/security/biometricVerification.dart';
 import 'package:expose_banq/view/security/security_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

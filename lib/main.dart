@@ -1,5 +1,5 @@
-import 'package:expose_banq/controllers/authController.dart';
-import 'package:expose_banq/controllers/languages.dart';
+import 'package:expose_banq/controllers/AuthController/authController.dart';
+import 'package:expose_banq/controllers/LanguageController/languages.dart';
 import 'package:expose_banq/view/kyc/kyc_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,6 +14,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twilio_flutter/twilio_flutter.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:flutter_config/flutter_config.dart';
 
 import 'view/starter/splash_screen.dart';
 
@@ -23,13 +25,11 @@ late SharedPreferences prefs;
 late bool lang;
 late bool showOnboardingScreen;
 late bool permission;
-var twilioFlutter = TwilioFlutter(
-    accountSid:
-        'ACd007b19e430cd677ddb854c507d84e10', // replace *** with Account SID
-    authToken:
-        'c0096727c19bfa30a07371bf3e98598c', // replace xxx with Auth Token
-    twilioNumber: '+15074797332' // replace .... with Twilio Number
-    );
+late String? phoneNumber, pinCode;
+late bool canAuthenticate;
+bool showVerification = true;
+final LocalAuthentication auth = LocalAuthentication();
+late var twilioFlutter;
 //firebase messaging initialized global variable
 FirebaseMessaging messaging = FirebaseMessaging.instance;
 //Specifying channel for notifications
@@ -107,9 +107,12 @@ late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await FlutterConfig.loadEnvVariables();
   prefs = await SharedPreferences.getInstance();
   permission = prefs.getBool('askForPermission') ?? true;
   lang = prefs.getBool('language') ?? true;
+  phoneNumber = prefs.getString('phoneNumber') ?? '';
+  pinCode = prefs.getString('pinCode') ?? '';
   if (lang) {
     locale = const Locale('en', 'US');
   } else {
@@ -122,10 +125,22 @@ Future<void> main() async {
     await Permission.camera.request();
   }
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+  canAuthenticate =
+      canAuthenticateWithBiometrics || await auth.isDeviceSupported();
 
   if (!kIsWeb) {
     await setupFlutterNotifications();
   }
+  //initializing twillio config for user to recieve message upon forgetting pin
+  twilioFlutter = TwilioFlutter(
+      accountSid: FlutterConfig.get(
+          'accountSidTwillio'), // replace *** with Account SID
+      authToken:
+          FlutterConfig.get('authTokenTwillio'), // replace xxx with Auth Token
+      twilioNumber:
+          FlutterConfig.get('twilioNumber') // replace .... with Twilio Number
+      );
   runApp(const MyApp());
 }
 

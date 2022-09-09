@@ -1,7 +1,12 @@
+import 'package:expose_banq/controllers/AuthController/authController.dart';
+import 'package:expose_banq/controllers/biometric/biometricController.dart';
+import 'package:expose_banq/main.dart';
 import 'package:expose_banq/view/bank_account/bank_account_screen.dart';
+import 'package:expose_banq/view/security/biometricVerification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/config.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:provider/provider.dart';
 
 import '../../const/exports.dart';
 import '../home/home_screen.dart';
@@ -16,6 +21,19 @@ class DrawerScreen extends StatefulWidget {
 
 class _DrawerScreenState extends State<DrawerScreen> {
   final zoomDrawerController = ZoomDrawerController();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      showVerification
+          ? showDialog(
+              context: context,
+              builder: (context) {
+                return const CreatePinScreen();
+              })
+          : null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

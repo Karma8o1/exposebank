@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expose_banq/const/loading.dart';
-import 'package:expose_banq/controllers/authController.dart';
+import 'package:expose_banq/controllers/AuthController/authController.dart';
 import 'package:expose_banq/main.dart';
 import 'package:expose_banq/view/kyc/kyc_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -122,11 +122,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: CustomTextField(
-                      controller: firstNameController,
-                      hintText: 'name'.tr,
-                      keyboardType: TextInputType.name,
-                      validator: (value) {},
-                    ),
+                        controller: firstNameController,
+                        hintText: 'name'.tr,
+                        keyboardType: TextInputType.name,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter mobile number';
+                          }
+                        }),
                   ),
 
                   /// email field
@@ -173,11 +176,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: CustomTextField(
-                      controller: usernameController,
-                      hintText: 'username'.tr,
-                      keyboardType: TextInputType.name,
-                      validator: (value) {},
-                    ),
+                        controller: usernameController,
+                        hintText: 'username'.tr,
+                        keyboardType: TextInputType.name,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter username';
+                          }
+                        }),
                   ),
 
                   /// pin code field
@@ -185,12 +191,22 @@ class _SignupScreenState extends State<SignupScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: CustomTextField(
-                      controller: pinCodeController,
-                      hintText: 'pin'.tr,
-                      keyboardType: TextInputType.number,
-                      obscure: true,
-                      validator: (value) {},
-                    ),
+                        controller: pinCodeController,
+                        hintText: 'pin'.tr,
+                        keyboardType: TextInputType.number,
+                        obscure: true,
+                        inputFormatter: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[+,0-9]')),
+                          MaskedInputFormatter('0000'),
+                        ],
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter pinCode';
+                          }
+                          if (value.length != 4) {
+                            return 'pin can only be 4 characters';
+                          }
+                        }),
                   ),
 
                   /// enter button
@@ -203,27 +219,23 @@ class _SignupScreenState extends State<SignupScreen> {
                       btnText: 'Enter',
                       onTap: () async {
                         if (_formKey.currentState!.validate()) {
-                          Get.to(KYCScreen(
-                            email: emailController.text,
-                            phoneNumber: phoneNumberController.text,
-                            pin: pinCodeController.text,
-                            userName: usernameController.text,
-                          ));
+                          setState(() {
+                            showVerification = false;
+                          });
+                          //kyc screen or know your customer
+                          Get.to(
+                            KYCScreen(
+                              email: emailController.text,
+                              phoneNumber: phoneNumberController.text,
+                              pin: pinCodeController.text,
+                              userName: usernameController.text,
+                            ),
+                            duration: const Duration(seconds: 2),
+                            transition: Transition.rightToLeft,
+                          );
                           //information drilled to KYC form so the regsitration could be done after
                           //KYC form is filled
 
-                          //registers user to firebase and stores the collected data.
-                          // if (_formKey.currentState!.validate()) {
-                          //   showLoading(context);
-                          //   AuthController.registerUser(
-                          //     phoneNumber: phoneNumberController.text.trim(),
-                          //     firstName: firstNameController.text.trim(),
-                          //     email: emailController.text.trim(),
-                          //     username: usernameController.text.trim(),
-                          //     pinCode: pinCodeController.text.trim(),
-                          //     context: context,
-                          //   );
-                          // }
                         }
                       },
                     ),

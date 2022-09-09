@@ -1,3 +1,4 @@
+import 'package:expose_banq/main.dart';
 import 'package:expose_banq/view/wrapper/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -6,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:elegant_notification/resources/arrays.dart';
 import 'package:expose_banq/const/loading.dart';
-import 'package:expose_banq/models/UserModel/user.dart';
+import 'package:expose_banq/models/UserModel/userAuthModel.dart';
 import 'package:expose_banq/view/auth/pin/login_pin.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ late String imageUrl;
 
 class AuthController {
   final auth.FirebaseAuth _fbAuth = auth.FirebaseAuth.instance;
+  final bool showVerification = false;
   Users? _userFromFirebase(auth.User? user) {
     if (user == null) {
       return null;
@@ -40,9 +42,12 @@ class AuthController {
         .then((value) {
       showLoading(context);
       if (value.docs[0]['pinCode'] == pinCode) {
+        prefs.setString('phoneNumber', phoneNumber);
+        prefs.setString('pinCode', pinCode);
         auth.FirebaseAuth.instance.verifyPhoneNumber(
           phoneNumber: phoneNumber,
           verificationCompleted: (auth.PhoneAuthCredential credential) async {
+            Get.back();
             await auth.FirebaseAuth.instance.signInWithCredential(credential);
             Get.off(const Wrapper());
           },
@@ -157,9 +162,11 @@ class AuthController {
             'townController': town,
             'notificationToken': token,
             //Urls of the images stored in firebase storage
-            'profilePicture': profile,
+            'profileImage': profile,
             'nicFront': cnicFront,
             'nicBack': cnicBack,
+            'isSuspended': false,
+            'isBanned': false,
           }).then((value) => Get.off(const Wrapper()));
         });
       },

@@ -1,11 +1,12 @@
 import 'dart:async';
 
+import 'package:expose_banq/controllers/biometric/biometricController.dart';
+import 'package:expose_banq/main.dart';
+import 'package:expose_banq/widgets/lib/src/flutter_pin_code_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../const/exports.dart';
-import '../../widgets/lib/flutter_pin_code_widget.dart';
-import '../drawer/drawer_screen.dart';
 
 class CreatePinScreen extends StatefulWidget {
   const CreatePinScreen({Key? key}) : super(key: key);
@@ -15,36 +16,15 @@ class CreatePinScreen extends StatefulWidget {
 }
 
 class _CreatePinScreenState extends State<CreatePinScreen> {
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    Timer(const Duration(seconds: 5), () => Get.to(const DrawerScreen(),),);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.blackColor,
-
-      /// appbar
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        leading: const BackButton(
-          color: AppColors.whiteColor,
-        ),
-        centerTitle: false,
-        titleSpacing: 8.0,
-        title: Text(
-          'Create PIN',
-          style: poppinsRegular.copyWith(
-            fontSize: 20.0,
-            color: AppColors.whiteColor,
-          ),
-        ),
-      ),
 
       /// body
       body: SizedBox(
@@ -56,7 +36,7 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
           children: [
             SizedBox(height: height(context) * 0.05),
             Text(
-              'Create your Pin',
+              'Verify before login',
               style: poppinsRegular.copyWith(
                 fontSize: 16.0,
                 color: AppColors.whiteColor,
@@ -88,26 +68,33 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
                       width: 1.0,
                     ),
                   ),
-                  child: Center(
-                    child: SvgPicture.asset(AppImages.touchBtnImage),
+                  child: InkWell(
+                    onTap: () async {
+                      bool isAuthenticated = await Biometric.authenticate();
+                      if (isAuthenticated) {
+                        setState(() {
+                          showVerification = false;
+                        });
+                        Get.back();
+                      }
+                    },
+                    child: Center(
+                      child: SvgPicture.asset(AppImages.touchBtnImage),
+                    ),
                   ),
                 ),
-                onFullPin: (_, __) {},
+                onFullPin: (value, __) {
+                  if (value == pinCode) {
+                    setState(() {
+                      showVerification = false;
+                    });
+                    Get.back();
+                  }
+                },
                 initialPinLength: 4,
                 onChangedPin: (_) {},
               ),
             ),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                'Resend PIN',
-                style: poppinsRegular.copyWith(
-                  fontSize: 16.0,
-                  color: AppColors.whiteColor,
-                ),
-              ),
-            ),
-
             SizedBox(height: height(context) * 0.04),
           ],
         ),

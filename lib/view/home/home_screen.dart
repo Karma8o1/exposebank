@@ -71,18 +71,49 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: EdgeInsets.only(left: 45.0),
           child: AppNameWidget(),
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 22.0,
-              backgroundColor: AppColors.redDarkColor,
-              child: CircleAvatar(
-                radius: 20.0,
-                backgroundImage: AssetImage(AppImages.userImage),
-              ),
-            ),
-          ),
+        actions: [
+          FutureBuilder(
+              future: FirebaseFirestore.instance
+                  .collection('userData')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .get(),
+              builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                if (snapshot.hasData &&
+                    snapshot.data!['profileImage'] == null) {
+                  return const Padding(
+                    padding: EdgeInsets.only(right: 16.0),
+                    child: CircleAvatar(
+                      radius: 22.0,
+                      backgroundColor: AppColors.redDarkColor,
+                      child: CircleAvatar(
+                        radius: 20.0,
+                        backgroundImage: AssetImage(AppImages.userImage),
+                      ),
+                    ),
+                  );
+                }
+                if (snapshot.hasData &&
+                    snapshot.data!['profileImage'] != null) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: CircleAvatar(
+                      radius: 22.0,
+                      backgroundColor: AppColors.redDarkColor,
+                      child: CircleAvatar(
+                        radius: 20.0,
+                        backgroundImage:
+                            NetworkImage(snapshot.data!['profileImage']),
+                      ),
+                    ),
+                  );
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1,
+                    ),
+                  );
+                }
+              }),
         ],
       ),
 

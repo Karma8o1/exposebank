@@ -3,19 +3,22 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:expose_banq/const/exports.dart';
 import 'package:expose_banq/const/loading.dart';
 import 'package:expose_banq/controllers/StorageController/storageController.dart';
-import 'package:expose_banq/controllers/authController.dart';
+import 'package:expose_banq/controllers/AuthController/authController.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_picker/file_picker.dart';
 
-String? profileImage = '', cnicFront = '', cnicBack = '';
+String? profileImage, cnicFront, cnicBack;
+File? profile, cnicF, cnicB;
 final storageRef = FirebaseStorage.instance.ref();
 // final cnicStorageRef = FirebaseStorage.instanceFor(
 //     bucket: "gs://expose-banq.appspot.com/cnicPictures");
@@ -52,7 +55,6 @@ class _KYCScreenState extends State<KYCScreen> {
   TextEditingController nicOrPassportExpiryDateController =
       TextEditingController();
   TextEditingController professionController = TextEditingController();
-  TextEditingController taxNumberController = TextEditingController();
   TextEditingController countryOfResidenceController = TextEditingController();
   TextEditingController regionOrProvinceController = TextEditingController();
   TextEditingController townController = TextEditingController();
@@ -352,25 +354,6 @@ class _KYCScreenState extends State<KYCScreen> {
                 ),
               ),
 
-              /// Tax Number field
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                child: CustomTextField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'This field cannot be empty.';
-                    } else {
-                      return null;
-                    }
-                  },
-                  radius: 8.0,
-                  controller: taxNumberController,
-                  hintText: 'Tax Number',
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-
               /// Country of residence field
               Padding(
                 padding:
@@ -428,112 +411,34 @@ class _KYCScreenState extends State<KYCScreen> {
               /// passport size photo
               InkWell(
                 onTap: () async {
-                  final results = await FilePicker.platform.pickFiles(
-                      allowMultiple: false,
-                      type: FileType.custom,
-                      allowedExtensions: ['png', 'jpg']);
-                  if (results == null) {
-                    ElegantNotification.error(
-                        description: const Text(
-                            'You need to pick an image to continue'));
-                    return;
+                  try {
+                    final results = await ImagePicker.platform
+                        .pickImage(source: ImageSource.camera);
+                    if (results == null) {
+                      ElegantNotification.error(
+                          description: const Text(
+                              'You need to pick an image to continue'));
+                      return;
+                    }
+                    final filePath = results.path;
+                    setState(() {
+                      profile = File(results.path);
+                    });
+                    showLoading(context);
+
+                    await StorageController.uploadImage(
+                            fileName: '${widget.email}_profile',
+                            filePath: filePath,
+                            bucketAddress: 'profilePictures')
+                        .then((value) {
+                      profileImage = value;
+                      Get.back();
+                    });
+                  } catch (e) {
+                    print(e.toString());
                   }
-                  final filePath = results.files.single.path;
-                  final fileName = results.files.single.name;
-                  setState(() async {
-                    profileImage = await StorageController.uploadImage(
-                        fileName: fileName,
-                        filePath: filePath,
-                        bucketAddress: 'profilePictures');
-                  });
-                  // showModalBottomSheet<void>(
-                  //   context: context,
-                  //   backgroundColor: Colors.transparent,
-                  //   builder: (BuildContext context) {
-                  //     return Container(
-                  //       decoration: const BoxDecoration(
-                  //           color: Colors.black87,
-                  //           borderRadius: BorderRadius.only(
-                  //               topLeft: Radius.circular(5),
-                  //               topRight: Radius.circular(5))),
-                  //       height: 200,
-                  //       child: Row(
-                  //         mainAxisAlignment: MainAxisAlignment.center,
-                  //         mainAxisSize: MainAxisSize.min,
-                  //         children: <Widget>[
-                  //           Column(
-                  //             mainAxisAlignment: MainAxisAlignment.center,
-                  //             crossAxisAlignment: CrossAxisAlignment.center,
-                  //             children: [
-                  //               InkWell(
-                  //                 onTap: () {},
-                  //                 child: SizedBox(
-                  //                   height: 50,
-                  //                   width: 50,
-                  //                   child:
-                  //                       Image.asset('assets/images/camera.png'),
-                  //                 ),
-                  //               ),
-                  //               const Text(
-                  //                 'CAMERA',
-                  //                 style: TextStyle(
-                  //                     color: Colors.white,
-                  //                     fontWeight: FontWeight.bold),
-                  //               )
-                  //             ],
-                  //           ),
-                  //           const VerticalDivider(
-                  //             width: 100,
-                  //           ),
-                  //           Column(
-                  //             mainAxisAlignment: MainAxisAlignment.center,
-                  //             crossAxisAlignment: CrossAxisAlignment.center,
-                  //             children: [
-                  //               InkWell(
-                  //                 onTap: () async {
-                  //                   final results = await FilePicker.platform
-                  //                       .pickFiles(
-                  //                           allowMultiple: false,
-                  //                           type: FileType.custom,
-                  //                           allowedExtensions: ['png', 'jpg']);
-                  //                   if (results == null) {
-                  //                     ElegantNotification.error(
-                  //                         description: const Text(
-                  //                             'You need to pick an image to continue'));
-                  //                     return;
-                  //                   }
-                  //                   final filePath = results.files.single.path;
-                  //                   final fileName = results.files.single.name;
-                  //                   setState(() async {
-                  //                     profileImage =
-                  //                         await StorageController.uploadImage(
-                  //                             fileName: fileName,
-                  //                             filePath: filePath,
-                  //                             bucketAddress: 'profilePictures');
-                  //                   });
-                  //                 },
-                  //                 child: SizedBox(
-                  //                   height: 50,
-                  //                   width: 50,
-                  //                   child: Image.asset(
-                  //                       'assets/images/gallery.png'),
-                  //                 ),
-                  //               ),
-                  //               const Text(
-                  //                 'GALLERY',
-                  //                 style: TextStyle(
-                  //                     color: Colors.white,
-                  //                     fontWeight: FontWeight.bold),
-                  //               )
-                  //             ],
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     );
-                  //   },
-                  // );
                 },
-                child: profileImage == null
+                child: profile == null
                     ? Container(
                         margin: const EdgeInsets.symmetric(
                             horizontal: 24.0, vertical: 8.0),
@@ -547,18 +452,21 @@ class _KYCScreenState extends State<KYCScreen> {
                           child: Icon(
                             Icons.camera_alt,
                             color: AppColors.blackColor,
-                            size: 100.0,
+                            size: 50.0,
                           ),
                         ),
                       )
-                    : Center(
-                        child: CircleAvatar(
-                            backgroundColor: Colors.grey,
-                            radius: 45,
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: Image.network(
-                                    'https://${profileImage as String}'))),
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        child: Center(
+                          child: ClipOval(
+                              child: Image.file(
+                            profile!,
+                            height: 200,
+                            width: 200,
+                            fit: BoxFit.cover,
+                          )),
+                        ),
                       ),
               ),
               Padding(
@@ -577,42 +485,63 @@ class _KYCScreenState extends State<KYCScreen> {
               /// national id card front photo
               InkWell(
                 onTap: () async {
-                  final results = await FilePicker.platform.pickFiles(
-                      allowMultiple: false,
-                      type: FileType.custom,
-                      allowedExtensions: ['png', 'jpg']);
-                  if (results == null) {
-                    ElegantNotification.error(
-                        description: const Text(
-                            'You need to pick an image to continue'));
-                    return;
+                  try {
+                    final results = await ImagePicker.platform
+                        .pickImage(source: ImageSource.camera);
+                    if (results == null) {
+                      ElegantNotification.error(
+                          description: const Text(
+                              'You need to pick an image to continue'));
+                      return;
+                    }
+                    final filePath = results.path;
+                    setState(() {
+                      cnicF = File(filePath);
+                    });
+                    showLoading(context);
+
+                    await StorageController.uploadImage(
+                            fileName: '${widget.email}_cnicFrontSide',
+                            filePath: filePath,
+                            bucketAddress: 'cnicPictures')
+                        .then((value) {
+                      cnicFront = value;
+                      Get.back();
+                    });
+                  } catch (e) {
+                    print(e.toString());
                   }
-                  final filePath = results.files.single.path;
-                  final fileName = results.files.single.name;
-                  setState(() async {
-                    cnicFront = await StorageController.uploadImage(
-                        fileName: fileName,
-                        filePath: filePath,
-                        bucketAddress: 'cnicPictures');
-                  });
                 },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 8.0),
-                  height: height(context) * 0.2,
-                  width: width(context),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    color: AppColors.whiteColor,
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.camera_alt,
-                      color: AppColors.blackColor,
-                      size: 40.0,
-                    ),
-                  ),
-                ),
+                child: cnicF == null
+                    ? Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 24.0, vertical: 8.0),
+                        height: height(context) * 0.2,
+                        width: width(context),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          color: AppColors.whiteColor,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.camera_alt,
+                            color: AppColors.blackColor,
+                            size: 50.0,
+                          ),
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 10.0),
+                        child: Center(
+                          child: Image.file(
+                            cnicF!,
+                            width: 500,
+                            height: 250,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
               ),
               Padding(
                 padding:
@@ -629,42 +558,62 @@ class _KYCScreenState extends State<KYCScreen> {
               /// national id card back photo
               InkWell(
                 onTap: () async {
-                  final results = await FilePicker.platform.pickFiles(
-                      allowMultiple: false,
-                      type: FileType.custom,
-                      allowedExtensions: ['png', 'jpg']);
-                  if (results == null) {
-                    ElegantNotification.error(
-                        description: const Text(
-                            'You need to pick an image to continue'));
-                    return;
+                  try {
+                    final results = await ImagePicker.platform
+                        .pickImage(source: ImageSource.camera);
+                    if (results == null) {
+                      ElegantNotification.error(
+                          description: const Text(
+                              'You need to pick an image to continue'));
+                      return;
+                    }
+                    final filePath = results.path;
+                    setState(() {
+                      cnicB = File(filePath);
+                    });
+                    showLoading(context);
+                    await StorageController.uploadImage(
+                            fileName: '${widget.email}_cnicBackSide',
+                            filePath: filePath,
+                            bucketAddress: 'cnicPictures')
+                        .then((value) {
+                      cnicBack = value;
+                      Get.back();
+                    });
+                  } catch (e) {
+                    print(e.toString());
                   }
-                  final filePath = results.files.single.path;
-                  final fileName = results.files.single.name;
-                  setState(() async {
-                    cnicBack = await StorageController.uploadImage(
-                        fileName: fileName,
-                        filePath: filePath,
-                        bucketAddress: 'cnicPictures');
-                  });
                 },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 8.0),
-                  height: height(context) * 0.2,
-                  width: width(context),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    color: AppColors.whiteColor,
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.camera_alt,
-                      color: AppColors.blackColor,
-                      size: 40.0,
-                    ),
-                  ),
-                ),
+                child: cnicB == null
+                    ? Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 24.0, vertical: 8.0),
+                        height: height(context) * 0.2,
+                        width: width(context),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          color: AppColors.whiteColor,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.camera_alt,
+                            color: AppColors.blackColor,
+                            size: 50.0,
+                          ),
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 10.0),
+                        child: Center(
+                          child: Image.file(
+                            cnicB!,
+                            width: 500,
+                            height: 250,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
               ),
               Padding(
                 padding:
@@ -730,5 +679,30 @@ class _KYCScreenState extends State<KYCScreen> {
         ),
       ),
     );
+  }
+
+  Future<String> uploadImage({
+    required String fileName,
+    required String? filePath,
+    required String bucketAddress,
+  }) async {
+    UploadTask? uploadTask;
+    File file = File(filePath ?? 'user');
+    showLoading(context);
+    try {
+      final ref = FirebaseStorage.instance.ref('$bucketAddress/$fileName');
+      uploadTask = ref.putFile(file);
+      // .then((value) {
+      //   // getDownloadUrl('$bucketAddress/$fileName');
+      // });
+      final snapshot = await uploadTask.whenComplete(() {});
+      final urlDownload = await snapshot.ref.getDownloadURL();
+      Get.back();
+      return urlDownload;
+    } on FirebaseException catch (e) {
+      Get.back();
+      print('Error: ${e.toString()}');
+      return '';
+    }
   }
 }

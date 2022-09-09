@@ -72,7 +72,7 @@ class _FailedScreenState extends State<FailedScreen> {
                 btnHeight: 55.0,
                 btnText: 'Back to Homepage',
                 onTap: () {
-                  Get.offAll(const DrawerScreen());
+                  Get.offAll(DrawerScreen());
                 },
                 btnColorOne: AppColors.violetColor,
                 btnColorTwo: AppColors.violetColor,

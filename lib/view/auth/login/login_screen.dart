@@ -1,5 +1,7 @@
 import 'package:expose_banq/const/exports.dart';
-import 'package:expose_banq/controllers/authController.dart';
+import 'package:expose_banq/controllers/AuthController/authController.dart';
+import 'package:expose_banq/controllers/biometric/biometricController.dart';
+import 'package:expose_banq/main.dart';
 import 'package:expose_banq/view/auth/pin/login_pin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -98,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     inputFormatter: [
                       FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                      MaskedInputFormatter('00000'),
+                      MaskedInputFormatter('0000'),
                     ],
                   ),
                 ),
@@ -121,6 +123,40 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
+                canAuthenticate && phoneNumber!.isNotEmpty
+                    ? InkWell(
+                        onTap: () async {
+                          final isAuthenticated =
+                              await Biometric.authenticate();
+                          if (isAuthenticated) {
+                            setState(() {
+                              phoneController.text = phoneNumber as String;
+                              pinCodeController.text = pinCode as String;
+                            });
+                            AuthController.signInUser(
+                              phoneNumber: phoneNumber as String,
+                              pinCode: pinCode as String,
+                              context: context,
+                            );
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              Icons.fingerprint_rounded,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                            Text(
+                              'Login with Biometrics',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
+                            )
+                          ],
+                        ))
+                    : const SizedBox(height: 0.0),
 
                 /// login button
                 const SizedBox(height: 32.0),
@@ -131,6 +167,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: CustomGradientButton(
                     btnText: 'Login',
                     onTap: () {
+                      setState(() {
+                        showVerification = false;
+                      });
                       AuthController.signInUser(
                         phoneNumber: phoneController.text,
                         pinCode: pinCodeController.text,
