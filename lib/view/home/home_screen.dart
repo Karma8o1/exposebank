@@ -200,10 +200,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             /// Bank Card
-            const FadeAnimation(
+            FadeAnimation(
               curve: Curves.fastLinearToSlowEaseIn,
               delay: 0.7,
-              child: BankCardWidget(),
+              child: BankCardWidget(
+                balance: 0.toString(),
+              ),
             ),
             const SizedBox(height: 24.0),
 

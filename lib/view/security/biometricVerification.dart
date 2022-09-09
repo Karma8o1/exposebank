@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:elegant_notification/elegant_notification.dart';
 import 'package:expose_banq/controllers/biometric/biometricController.dart';
 import 'package:expose_banq/main.dart';
 import 'package:expose_banq/widgets/lib/src/flutter_pin_code_widget.dart';
@@ -79,7 +80,9 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
                       }
                     },
                     child: Center(
-                      child: SvgPicture.asset(AppImages.touchBtnImage),
+                      child: SvgPicture.asset(
+                        AppImages.touchBtnImage,
+                      ),
                     ),
                   ),
                 ),
@@ -89,6 +92,12 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
                       showVerification = false;
                     });
                     Get.back();
+                  } else {
+                    ElegantNotification.error(
+                      title: Text('Error'),
+                      description: Text('Pin code does not match'),
+                      toastDuration: const Duration(seconds: 5),
+                    );
                   }
                 },
                 initialPinLength: 4,

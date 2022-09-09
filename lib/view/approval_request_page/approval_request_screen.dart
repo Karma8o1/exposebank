@@ -42,9 +42,9 @@ class _ApprovalRequestScreenState extends State<ApprovalRequestScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-
-
-            const SizedBox(height: 30.0,),
+            const SizedBox(
+              height: 30.0,
+            ),
             Padding(
               padding: const EdgeInsets.only(left: 24.0),
               child: Text(
@@ -55,11 +55,9 @@ class _ApprovalRequestScreenState extends State<ApprovalRequestScreen> {
                 ),
               ),
             ),
-
             VerifyBox(
               isVerify: true,
               userNameText: 'John Fonesca',
-              timeText: '10:30pm',
               paymentValueText: '+ ₦1,800,400',
               onTap: () {
                 Get.to(const ApprovalRequestVerificationScreen());
@@ -67,8 +65,7 @@ class _ApprovalRequestScreenState extends State<ApprovalRequestScreen> {
             ),
             VerifyBox(
               isVerify: true,
-              userNameText: 'John Fonesca',
-              timeText: '10:30pm',
+              userNameText: 'John Fonesc',
               paymentValueText: '+ ₦1,800,400',
               onTap: () {
                 Get.to(const ApprovalRequestTwoScreen());
@@ -77,9 +74,8 @@ class _ApprovalRequestScreenState extends State<ApprovalRequestScreen> {
             VerifyBox(
               isVerify: false,
               userNameText: 'MTN Airtime Topup',
-              timeText: '05:40pm',
               paymentValueText: '- ₦2,500',
-              onTap: () {  },
+              onTap: () {},
             ),
           ],
         ),

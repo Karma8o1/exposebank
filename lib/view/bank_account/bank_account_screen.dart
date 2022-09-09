@@ -1,7 +1,11 @@
+// ignore_for_file: must_be_immutable
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expose_banq/models/privateAccountModel/private_account_model.dart';
+import 'package:expose_banq/models/transactionModel/transaction_model.dart';
 import 'package:expose_banq/view/approval_request_page/approval_request_screen.dart';
-import 'package:expose_banq/view/home/components/open_account_button.dart';
-import 'package:expose_banq/view/home/open_account_screen.dart';
 import 'package:expose_banq/widgets/fade_animation.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -12,12 +16,12 @@ import '../deposit/desposit_screen.dart';
 import '../home/components/bank_card.dart';
 import '../home/components/quick_service_box.dart';
 import '../home/components/transaction_card_box.dart';
-import '../home/open_joint_account.dart';
 import '../payment_transfer/transfer_screen.dart';
 import '../withdraw/withdraw_screen.dart';
 
 class BankAccountPage extends StatefulWidget {
-  const BankAccountPage({Key? key}) : super(key: key);
+  BankAccountPage({Key? key, required this.privateAccount}) : super(key: key);
+  PrivateAccountModel privateAccount;
 
   @override
   State<BankAccountPage> createState() => _BankAccountPageState();
@@ -95,14 +99,14 @@ class _BankAccountPageState extends State<BankAccountPage> {
               curve: Curves.fastLinearToSlowEaseIn,
               delay: 1.0,
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 5.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      'Hi, First Name',
+                      'Hi, ${widget.privateAccount.accountName}',
                       style: poppinsRegular.copyWith(
                         fontSize: 20.0,
                         color: AppColors.whiteColor,
@@ -111,7 +115,7 @@ class _BankAccountPageState extends State<BankAccountPage> {
                     const Spacer(),
                     IconButton(
                       onPressed: () {
-                        Get.to(ApprovalRequestScreen());
+                        Get.to(const ApprovalRequestScreen());
                       },
                       icon: Stack(
                         children: [
@@ -131,7 +135,8 @@ class _BankAccountPageState extends State<BankAccountPage> {
                                 color: AppColors.redDarkColor,
                               ),
                               child: Center(
-                                child: Text('2',
+                                child: Text(
+                                  '0',
                                   style: poppinsLight.copyWith(
                                     fontSize: 8.0,
                                     color: AppColors.whiteColor,
@@ -149,10 +154,12 @@ class _BankAccountPageState extends State<BankAccountPage> {
             ),
 
             /// Bank Card
-            const FadeAnimation(
+            FadeAnimation(
               curve: Curves.fastLinearToSlowEaseIn,
               delay: 0.7,
-              child: BankCardWidget(),
+              child: BankCardWidget(
+                balance: widget.privateAccount.balance.toString(),
+              ),
             ),
             const SizedBox(height: 24.0),
 
@@ -250,23 +257,52 @@ class _BankAccountPageState extends State<BankAccountPage> {
 
                   /// list of transactions
                   const SizedBox(height: 10.0),
-
-                  FadeAnimation(
-                    curve: Curves.ease,
-                    delay: 1.3,
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.only(bottom: 50.0),
-                      itemCount: transTypeTexts.length,
-                      itemBuilder: (context, index) {
-                        return TransactionCardBox(
-                          transactionType: transTypeTexts[index],
-                          moneyColor: textColors[index],
-                        );
-                      },
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('transactions')
+                          .snapshots(),
+                      builder:
+                          ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.data!.docs.isNotEmpty &&
+                            snapshot.hasData) {
+                          return FadeAnimation(
+                            curve: Curves.ease,
+                            delay: 1.3,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              padding: const EdgeInsets.only(bottom: 50.0),
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (context, index) {
+                                return TransactionCardBox(
+                                  transactionType: transTypeTexts[index],
+                                  moneyColor: textColors[index],
+                                );
+                              },
+                            ),
+                          );
+                        }
+                        if (snapshot.data!.docs.isNotEmpty &&
+                            snapshot.hasData) {
+                          return const Center(
+                            child: Text(
+                              'No transaction in this account. Yet!',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          );
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 1,
+                            ),
+                          );
+                        }
+                      })),
                 ],
               ),
             ),

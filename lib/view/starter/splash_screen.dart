@@ -45,9 +45,8 @@ class _SplashScreenState extends State<SplashScreen> {
           width: MediaQuery.of(context).size.width - 50,
         ).show(context);
       }
-      // print('Data retrieved from hive: ${hiveData.get('firstTime')}');
       Timer(
-          const Duration(seconds: 2),
+          const Duration(seconds: 0),
           () => Get.off(showOnboardingScreen
               ? const OnBoardingScreen()
               : const Wrapper()));

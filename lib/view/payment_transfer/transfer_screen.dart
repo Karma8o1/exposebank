@@ -1,13 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expose_banq/const/exports.dart';
-import 'package:expose_banq/view/payment_transfer/amount_screen.dart';
-import 'package:expose_banq/view/payment_transfer/verification_screen.dart';
-import 'package:expose_banq/view/security/biometricVerification.dart';
 import 'package:expose_banq/view/security/security_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'components/card_type_widget.dart';
 import 'components/card_widget.dart';
 import 'components/to_card_widget.dart';
 
@@ -19,7 +16,6 @@ class TransferScreen extends StatefulWidget {
 }
 
 class _TransferScreenState extends State<TransferScreen> {
-
   List<String> nameTexts = [
     'Maria Callas',
     'Matt Hardy',
@@ -98,29 +94,35 @@ class _TransferScreenState extends State<TransferScreen> {
 
             /// from the cards
             const SizedBox(height: 16.0),
-            SizedBox(
-              height: 100,
-              width: width(context),
-              child: CarouselSlider(
-                  items: const [
-                    FromCardWidget(),
-                    FromCardWidget(),
-                    FromCardWidget(),
-                  ],
-                  options: CarouselOptions(
-                    aspectRatio: 16 / 9,
-                    viewportFraction: 0.8,
-                    initialPage: 0,
-                    enableInfiniteScroll: true,
-                    reverse: false,
-                    autoPlay: false,
-                    autoPlayInterval: const Duration(seconds: 5),
-                    autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                    autoPlayCurve: Curves.fastOutSlowIn,
-                    enlargeCenterPage: true,
-                    onPageChanged: (index, slide) {},
-                    scrollDirection: Axis.horizontal,
-                  )),
+            StreamBuilder(
+              builder: ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                  return SizedBox(
+                    height: 100,
+                    width: width(context),
+                    // child: DropdownButton(items: snapshot.data.docs),
+                  );
+                }
+                if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No Accounts have been created yet',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  );
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 1,
+                    ),
+                  );
+                }
+              }),
             ),
 
             /// to the card texts
@@ -142,25 +144,26 @@ class _TransferScreenState extends State<TransferScreen> {
               height: 100,
               width: width(context),
               child: CarouselSlider(
-                  items: const [
-                    ToCardWidget(),
-                    ToCardWidget(),
-                    ToCardWidget(),
-                  ],
-                  options: CarouselOptions(
-                    aspectRatio: 16 / 9,
-                    viewportFraction: 0.8,
-                    initialPage: 0,
-                    enableInfiniteScroll: true,
-                    reverse: false,
-                    autoPlay: false,
-                    autoPlayInterval: const Duration(seconds: 5),
-                    autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                    autoPlayCurve: Curves.fastOutSlowIn,
-                    enlargeCenterPage: true,
-                    onPageChanged: (index, slide) {},
-                    scrollDirection: Axis.horizontal,
-                  ),),
+                items: const [
+                  ToCardWidget(),
+                  ToCardWidget(),
+                  ToCardWidget(),
+                ],
+                options: CarouselOptions(
+                  aspectRatio: 16 / 9,
+                  viewportFraction: 0.8,
+                  initialPage: 0,
+                  enableInfiniteScroll: true,
+                  reverse: false,
+                  autoPlay: false,
+                  autoPlayInterval: const Duration(seconds: 5),
+                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  enlargeCenterPage: true,
+                  onPageChanged: (index, slide) {},
+                  scrollDirection: Axis.horizontal,
+                ),
+              ),
             ),
 
             const SizedBox(height: 50.0),
@@ -202,12 +205,13 @@ class _TransferScreenState extends State<TransferScreen> {
             SizedBox(height: height(context) * 0.2),
             Center(
               child: InkWell(
-                onTap: (){
+                onTap: () {
                   Get.to(SecurityScreen());
                 },
                 borderRadius: BorderRadius.circular(50.0),
                 child: Ink(
-                  padding: const EdgeInsets.symmetric(horizontal: 48.0, vertical: 14.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 48.0, vertical: 14.0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50.0),
                     gradient: const LinearGradient(
@@ -219,7 +223,8 @@ class _TransferScreenState extends State<TransferScreen> {
                       end: Alignment.bottomCenter,
                     ),
                   ),
-                  child: Text('Transfer',
+                  child: Text(
+                    'Transfer',
                     style: poppinsSemiBold.copyWith(
                       fontSize: 14.0,
                       color: AppColors.whiteColor,
@@ -229,7 +234,7 @@ class _TransferScreenState extends State<TransferScreen> {
               ),
             ),
 
-           /* Expanded(
+            /* Expanded(
               child: Container(
                 width: width(context),
                 decoration: const BoxDecoration(
@@ -304,7 +309,6 @@ class _TransferScreenState extends State<TransferScreen> {
                 ),
               ),
             ),*/
-
           ],
         ),
       ),

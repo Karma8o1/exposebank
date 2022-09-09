@@ -1,3 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expose_banq/controllers/userDataController/userDataController.dart';
+import 'package:expose_banq/models/privateAccountModel/private_account_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -47,10 +51,8 @@ class _VerifiedAccountsScreenState extends State<VerifiedAccountsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
-          children:  [
-
+          children: [
             const SizedBox(height: 36.0),
-
             Center(
               child: Text(
                 'Bank Accounts List',
@@ -60,34 +62,63 @@ class _VerifiedAccountsScreenState extends State<VerifiedAccountsScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 36.0),
-            VerifyBox(
-              isVerify: true,
-              userNameText: 'John Fonesca',
-              timeText: '10:30pm',
-              paymentValueText: '+ ₦1,800,400',
-              onTap: () {
-                Get.offAll(const DrawerOneScreen());
-              },
-            ),
-            VerifyBox(
-              isVerify: true,
-              userNameText: 'John Fonesca',
-              timeText: '10:30pm',
-              paymentValueText: '+ ₦1,800,400',
-              onTap: () {
-                Get.offAll(const DrawerOneScreen());
-              },
-            ),
-            VerifyBox(
-              isVerify: false,
-              userNameText: 'MTN Airtime Topup',
-              timeText: '05:40pm',
-              paymentValueText: '- ₦2,500',
-              onTap: () {
-                Get.offAll(const DrawerOneScreen());
-              },
+            GetBuilder<UserDataController>(
+              builder: ((_) {
+                return StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('indiAccount')
+                        .where(
+                          'userRef',
+                          isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                        )
+                        .snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                        return Expanded(
+                            child: ListView.builder(
+                                itemCount: snapshot.data!.docs.length,
+                                itemBuilder: (context, int index) {
+                                  return VerifyBox(
+                                    userImagePath: _.userData.profile,
+                                    isVerify: snapshot.data!.docs[index]
+                                        ['isVerified'],
+                                    userNameText: snapshot.data!.docs[index].id,
+                                    paymentValueText: snapshot
+                                        .data!.docs[index]['balance']
+                                        .toString(),
+                                    onTap: () {
+                                      Get.offAll(DrawerOneScreen(
+                                        privateAccount:
+                                            PrivateAccountModel.fromJSON(
+                                          snapshot.data!.docs[index],
+                                        ),
+                                      ));
+                                    },
+                                  );
+                                }));
+                      }
+                      if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No Accounts Exist',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.red,
+                            strokeWidth: 1,
+                          ),
+                        );
+                      }
+                    });
+              }),
             ),
           ],
         ),

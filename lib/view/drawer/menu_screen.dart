@@ -26,22 +26,6 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  late final UserDataController userData;
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      FirebaseFirestore.instance
-          .collection('userData')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .get()
-          .then((value) {
-        print('the value of snapshot is : ${value['phoneNumber']}');
-        userData =
-            Get.put(UserDataController(userData: UserData.fromJson(value)));
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -76,80 +60,52 @@ class _MenuScreenState extends State<MenuScreen> {
 
                 /// user name
                 const SizedBox(height: 16.0),
-                GetBuilder<UserDataController>(builder: (_) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 16.0),
-                      CircleAvatar(
-                        radius: 25.0,
-                        backgroundImage: NetworkImage(_.userData.profile),
-                      ),
-                      Text(
-                        _.userData.firstName,
-                        style: poppinsLight.copyWith(
-                          fontSize: 18.0,
-                          color: AppColors.whiteColor,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
+                              /// Open Bank Account Immediately button
 
-                      /// user number and email
-                      const SizedBox(height: 8.0),
-                      Text(
-                        '${_.userData.phoneNumber} ${_.userData.email.contains('@gmail.com') ? _.userData.email.toString().replaceAll('@gmail.com', '') : _.userData.email.toString().replaceAll('.com', '')}',
-                        style: poppinsLight.copyWith(
-                          fontSize: 12.0,
-                          color: AppColors.whiteColor,
-                        ),
-                      ),
-                    ],
-                  );
-                }),
-                // FutureBuilder(
-                //     future: FirebaseFirestore.instance
-                //         .collection('userData')
-                //         .doc(FirebaseAuth.instance.currentUser!.uid)
-                //         .get(),
-                //     builder: (context, AsyncSnapshot snapshot) {
-                //       if (snapshot.hasData && snapshot.data != null) {
-                //         return Column(
-                //           crossAxisAlignment: CrossAxisAlignment.start,
-                //           children: [
-                //             const SizedBox(height: 16.0),
-                //             CircleAvatar(
-                //               radius: 25.0,
-                //               backgroundImage: NetworkImage(
-                //                   snapshot.data['profileImage'] ??
-                //                       AppImages.userImage),
-                //             ),
-                //             Text(
-                //               snapshot.data['firstName'],
-                //               style: poppinsLight.copyWith(
-                //                 fontSize: 18.0,
-                //                 color: AppColors.whiteColor,
-                //                 fontStyle: FontStyle.italic,
-                //               ),
-                //             ),
+                FutureBuilder(
+                    future: FirebaseFirestore.instance
+                        .collection('userData')
+                        .doc(FirebaseAuth.instance.currentUser!.uid)
+                        .get(),
+                    builder: (context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 16.0),
+                            CircleAvatar(
+                              radius: 25.0,
+                              backgroundImage: NetworkImage(
+                                  snapshot.data['profileImage'] ??
+                                      AppImages.userImage),
+                            ),
+                            Text(
+                              snapshot.data['firstName'],
+                              style: poppinsLight.copyWith(
+                                fontSize: 18.0,
+                                color: AppColors.whiteColor,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
 
-                //             /// user number and email
-                //             const SizedBox(height: 8.0),
-                //             Text(
-                //               '${snapshot.data['phoneNumber']} ${_.userData.email.contains('@gmail.com') ? _.userData.email.toString().replaceAll('@gmail.com', '') : _.userData.email.toString().replaceAll('.com', '')}',
-                //               style: poppinsLight.copyWith(
-                //                 fontSize: 12.0,
-                //                 color: AppColors.whiteColor,
-                //               ),
-                //             ),
-                //           ],
-                //         );
-                //       } else {
-                //         return const Text(
-                //           'Loading.....',
-                //           style: TextStyle(color: Colors.white),
-                //         );
-                //       }
-                //     }),
+                            /// user number and email
+                            const SizedBox(height: 8.0),
+                            Text(
+                              '${snapshot.data['phoneNumber']} ${snapshot.data['emailAddress'].contains('@gmail.com') ? snapshot.data['emailAddress'].toString().replaceAll('@gmail.com', '') : snapshot.data['emailAddress'].toString().replaceAll('.com', '')}',
+                              style: poppinsLight.copyWith(
+                                fontSize: 12.0,
+                                color: AppColors.whiteColor,
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return const Text(
+                          'Loading.....',
+                          style: TextStyle(color: Colors.white),
+                        );
+                      }
+                    }),
 
                 SizedBox(height: height(context) * 0.02),
                 MenuButtonWidget(

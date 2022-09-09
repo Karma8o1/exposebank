@@ -6,18 +6,17 @@ class VerifyBox extends StatelessWidget {
   final bool? isVerify;
   final String? userImagePath;
   final String? userNameText;
-  final String? timeText;
   final String? paymentValueText;
   final VoidCallback? onTap;
 
-  const VerifyBox({Key? key,
+  const VerifyBox({
+    Key? key,
     required this.onTap,
     required this.isVerify,
     this.userImagePath = AppImages.userImage,
     required this.userNameText,
-    required this.timeText,
     required this.paymentValueText,
-}) : super(key: key);
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +35,7 @@ class VerifyBox extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             CircleAvatar(
-              backgroundImage: AssetImage(userImagePath!),
+              backgroundImage: NetworkImage(userImagePath!),
             ),
             const SizedBox(width: 12.0),
             Expanded(
@@ -44,26 +43,30 @@ class VerifyBox extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(userNameText!,
+                  Text(
+                    userNameText!,
                     style: poppinsMedium.copyWith(
                       fontSize: 16.0,
                       color: AppColors.blackColor,
                     ),
                   ),
-                  const SizedBox(height: 4.0),
-                  Text(timeText!,
-                    style: poppinsLight.copyWith(
-                      fontSize: 14.0,
-                      color: AppColors.greyColor,
-                    ),
-                  ),
+                  // const SizedBox(height: 4.0),
+                  // Text(timeText!,
+                  //   style: poppinsLight.copyWith(
+                  //     fontSize: 14.0,
+                  //     color: AppColors.greyColor,
+                  //   ),
+                  // ),
                 ],
               ),
             ),
-            Text(paymentValueText!,
+            Text(
+              paymentValueText!,
               style: poppinsMedium.copyWith(
                 fontSize: 16.0,
-                color: isVerify == true ? AppColors.parrotDarkColor : AppColors.redDarkColor,
+                color: isVerify == true
+                    ? AppColors.parrotDarkColor
+                    : AppColors.redDarkColor,
               ),
             ),
           ],

@@ -1,16 +1,26 @@
+// ignore_for_file: must_be_immutable
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expose_banq/controllers/AuthController/authController.dart';
 import 'package:expose_banq/controllers/biometric/biometricController.dart';
+import 'package:expose_banq/controllers/userDataController/userDataController.dart';
 import 'package:expose_banq/main.dart';
+import 'package:expose_banq/models/privateAccountModel/private_account_model.dart';
+import 'package:expose_banq/models/userData/userDataModel.dart';
 import 'package:expose_banq/view/bank_account/bank_account_screen.dart';
 import 'package:expose_banq/view/security/biometricVerification.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/config.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../const/exports.dart';
 import '../home/home_screen.dart';
 import 'menu_screen.dart';
+
+late final UserDataController userData;
 
 class DrawerScreen extends StatefulWidget {
   const DrawerScreen({Key? key}) : super(key: key);
@@ -32,6 +42,16 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 return const CreatePinScreen();
               })
           : null;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      FirebaseFirestore.instance
+          .collection('userData')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get()
+          .then((value) {
+        userData =
+            Get.put(UserDataController(userData: UserData.fromJson(value)));
+      });
     });
   }
 
@@ -59,7 +79,8 @@ class _DrawerScreenState extends State<DrawerScreen> {
 }
 
 class DrawerOneScreen extends StatefulWidget {
-  const DrawerOneScreen({Key? key}) : super(key: key);
+  DrawerOneScreen({Key? key, required this.privateAccount}) : super(key: key);
+  PrivateAccountModel privateAccount;
 
   @override
   State<DrawerOneScreen> createState() => _DrawerOneScreenState();
@@ -73,7 +94,9 @@ class _DrawerOneScreenState extends State<DrawerOneScreen> {
     return ZoomDrawer(
       controller: zoomDrawerController,
       menuScreen: const MenuScreen(),
-      mainScreen: const BankAccountPage(),
+      mainScreen: BankAccountPage(
+        privateAccount: widget.privateAccount,
+      ),
       clipMainScreen: false,
       borderRadius: 24.0,
       angle: 0.0,

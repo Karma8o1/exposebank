@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,8 +7,8 @@ import 'package:flutter/material.dart';
 import '../../../const/exports.dart';
 
 class BankCardWidget extends StatelessWidget {
-  const BankCardWidget({Key? key}) : super(key: key);
-
+  BankCardWidget({Key? key, required this.balance}) : super(key: key);
+  String balance;
   @override
   Widget build(BuildContext context) {
     return Container(

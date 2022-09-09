@@ -2,29 +2,25 @@
 const functions = require("firebase-functions");
 //Initialized firebase admin to check firebase data
 const admin = require('firebase-admin');
-//
-const Flutterwave = require('flutterwave-node-v3');
-const flw = new Flutterwave(process.env.FLW_PUBLIC_KEY, process.env.FLW_SECRET_KEY);
-
+// The Firebase Admin SDK to access Firestore.
 admin.initializeApp();
-exports.sendUserNotification = functions.https.onCall(async (data, context)=>{
-    const registrationToken = data.registrationToken;
-    const message = {
-        data: {
-          score: '850',
-          time: '2:45'
-        },
-        token: registrationToken
-      };
-    getMessaging().send(message)
-    .then((response) => {
-    // Response is a message ID string.
-    console.log('Successfully sent message:', response);
-    })
-    .catch((error) => {
-    console.log('Error sending message:', error);
-    });
 
-})
-exports.createNewAccount = functions.https.onCall(async(data, context)=>{
-})
+const db = admin.firestore();
+
+
+exports.messageNotificationTrigger = (change, context) => {
+
+  db.collection('usersData').get().then((snapshot) => {
+    snapshot.docs.forEach(doc => {
+
+      const userData = doc.data();
+
+      if (userData.id == '<YOUR_USER_ID>') {
+         admin.messaging().sendToDevice(userData.deviceToken, {
+           notification: {
+             title: 'Notification title', body: 'Notification Body'}
+           });
+      }
+    });
+  });
+};
