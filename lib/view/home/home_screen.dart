@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:expose_banq/models/privateAccountModel/private_account_model.dart';
 import 'package:expose_banq/view/approval_request_page/approval_request_screen.dart';
 import 'package:expose_banq/view/home/components/open_account_button.dart';
 import 'package:expose_banq/view/home/open_account_screen.dart';
@@ -159,253 +161,422 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         }),
                     const Spacer(),
-                    IconButton(
-                      onPressed: () {
-                        Get.to(const ApprovalRequestScreen());
-                      },
-                      icon: Stack(
-                        children: [
-                          const Icon(
-                            Icons.notifications,
-                            color: AppColors.blackColor,
-                            size: 28.0,
-                          ),
-                          Positioned(
-                            top: 0.0,
-                            right: 0.0,
-                            child: Container(
-                              height: 12.0,
-                              width: 12.0,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.redDarkColor,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '2',
-                                  style: poppinsLight.copyWith(
-                                    fontSize: 8.0,
-                                    color: AppColors.whiteColor,
+                    StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('requests')
+                            .where('recieverRef',
+                                isEqualTo:
+                                    FirebaseAuth.instance.currentUser!.uid)
+                            .where(
+                              'isPermissionGranted',
+                              isEqualTo: 'Awaited',
+                            )
+                            .snapshots(),
+                        builder:
+                            ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.hasData &&
+                              snapshot.data!.docs.isNotEmpty) {
+                            return IconButton(
+                              onPressed: () {
+                                Get.to(const ApprovalRequestScreen());
+                              },
+                              icon: Stack(
+                                children: [
+                                  const Icon(
+                                    Icons.notifications,
+                                    color: AppColors.blackColor,
+                                    size: 28.0,
                                   ),
-                                ),
+                                  Positioned(
+                                    top: 0.0,
+                                    right: 0.0,
+                                    child: Container(
+                                      height: 12.0,
+                                      width: 12.0,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: AppColors.redDarkColor,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          snapshot.data!.docs.length.toString(),
+                                          style: poppinsLight.copyWith(
+                                            fontSize: 8.0,
+                                            color: AppColors.whiteColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                            );
+                          }
+                          if (snapshot.data!.docs.isEmpty) {
+                            return IconButton(
+                              onPressed: () {
+                                Get.to(const ApprovalRequestScreen());
+                              },
+                              icon: Stack(
+                                children: [
+                                  const Icon(
+                                    Icons.notifications,
+                                    color: AppColors.blackColor,
+                                    size: 28.0,
+                                  ),
+                                  Positioned(
+                                    top: 0.0,
+                                    right: 0.0,
+                                    child: Container(
+                                      height: 12.0,
+                                      width: 12.0,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.transparent,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          '',
+                                          style: poppinsLight.copyWith(
+                                            fontSize: 8.0,
+                                            color: AppColors.whiteColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return IconButton(
+                              onPressed: () {
+                                Get.to(const ApprovalRequestScreen());
+                              },
+                              icon: Stack(
+                                children: [
+                                  const Icon(
+                                    Icons.notifications,
+                                    color: AppColors.blackColor,
+                                    size: 28.0,
+                                  ),
+                                  Positioned(
+                                    top: 0.0,
+                                    right: 0.0,
+                                    child: Container(
+                                      height: 12.0,
+                                      width: 12.0,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.transparent,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          '',
+                                          style: poppinsLight.copyWith(
+                                            fontSize: 8.0,
+                                            color: AppColors.whiteColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        })),
                   ],
                 ),
               ),
             ),
 
             /// Bank Card
-            FadeAnimation(
-              curve: Curves.fastLinearToSlowEaseIn,
-              delay: 0.7,
-              child: BankCardWidget(
-                balance: 0.toString(),
-              ),
-            ),
-            const SizedBox(height: 24.0),
-
-            Container(
-              width: width(context),
-              decoration: const BoxDecoration(
-                color: AppColors.blackColor,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(24.0),
-                  topLeft: Radius.circular(24.0),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  /// Quick Service texts
-                  SizedBox(height: height(context) * 0.024),
-                  FadeAnimation(
-                    curve: Curves.ease,
-                    delay: 1.2,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      child: Text(
-                        'Quick Service',
-                        style: poppinsLight.copyWith(
-                          fontSize: 15.0,
-                          color: AppColors.greyColor,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  /// quick services box
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: FadeAnimation(
-                      curve: Curves.ease,
-                      delay: 1.2,
-                      child: SizedBox(
-                        width: width(context),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              QuickServiceBox(
-                                onTap: () {
-                                  Get.to(const TransferScreen());
-                                },
-                                icon: CupertinoIcons.arrow_right_arrow_left,
-                                text: 'Transfer',
-                              ),
-                              SizedBox(width: height(context) * 0.032),
-                              QuickServiceBox(
-                                onTap: () {
-                                  Get.to(const DepositScreen());
-                                },
-                                icon: CupertinoIcons.arrow_down,
-                                text: 'Deposit',
-                              ),
-                              SizedBox(width: height(context) * 0.032),
-                              QuickServiceBox(
-                                onTap: () {
-                                  Get.to(const WithdrawScreen());
-                                },
-                                icon: CupertinoIcons.arrow_up,
-                                text: 'Withdraw',
-                                borderColor: AppColors.redDarkColor,
-                              ),
-                            ],
+            StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('indiAccount')
+                    .where(
+                      'userRef',
+                      isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                    )
+                    .limit(1)
+                    .snapshots(),
+                builder: ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                    PrivateAccountModel privateAccount =
+                        PrivateAccountModel.fromJSON(snapshot.data!.docs[0]);
+                    return Column(
+                      children: [
+                        FadeAnimation(
+                          curve: Curves.fastLinearToSlowEaseIn,
+                          delay: 0.7,
+                          child: BankCardWidget(
+                            accountName: snapshot.data!.docs[0].id,
+                            accountType: 'indiAccount',
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-
-                  /// click button to Open Bank Account
-                  SizedBox(height: height(context) * 0.008),
-                  FadeAnimation(
-                    curve: Curves.ease,
-                    delay: 1.2,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      child: Text(
-                        'Click Button Below To Open Bank Account',
-                        style: poppinsLight.copyWith(
-                          fontSize: 15.0,
-                          color: AppColors.greyColor,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: height(context) * 0.016),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        OpenAccountButton(
-                          onTap: () {
-                            Get.to(const OpenAccountScreen());
-                          },
-                          icon: Icons.lock,
-                          text: 'Private Account',
-                        ),
-                        OpenAccountButton(
-                          onTap: () {
-                            Get.to(const OpenJointAccountScreen());
-                          },
-                          icon: Icons.lock,
-                          text: 'Joint Account',
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  /// Transaction history texts
-                  SizedBox(height: height(context) * 0.016),
-                  FadeAnimation(
-                    curve: Curves.ease,
-                    delay: 1.3,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 16.0),
-                      child: Text(
-                        'Transaction History',
-                        style: poppinsLight.copyWith(
-                          fontSize: 15.0,
-                          color: AppColors.greyColor,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  /// list of transactions
-                  const SizedBox(height: 10.0),
-                  StreamBuilder(
-                      stream: FirebaseFirestore.instance
-                          .collection('transactions')
-                          .where('userId',
-                              isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                          .snapshots(),
-                      builder:
-                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.hasData &&
-                            snapshot.data!.docs.isNotEmpty) {
-                          return FadeAnimation(
-                            curve: Curves.ease,
-                            delay: 1.3,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              padding: const EdgeInsets.only(bottom: 50.0),
-                              itemCount: snapshot.data!.docs.length,
-                              itemBuilder: (context, index) {
-                                return TransactionCardBox(
-                                  transactionType: snapshot.data!.docs[index]
-                                      ['transactionType'],
-                                  moneyColor: snapshot.data!.docs[index]
-                                              ['transactionType'] ==
-                                          'deposit'
-                                      ? Colors.green
-                                      : Colors.red,
-                                );
-                              },
+                        const SizedBox(height: 24.0),
+                        Container(
+                          width: width(context),
+                          decoration: const BoxDecoration(
+                            color: AppColors.blackColor,
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(24.0),
+                              topLeft: Radius.circular(24.0),
                             ),
-                          );
-                        }
-                        if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: SizedBox(
-                              height: MediaQuery.of(context).size.height / 4.8,
-                              child: Center(
-                                child: Text(
-                                  'No Transactions till now',
-                                  style: poppinsRegular.copyWith(
-                                    fontSize: 12.0,
-                                    color: Colors.white,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              /// Quick Service texts
+                              SizedBox(height: height(context) * 0.024),
+                              FadeAnimation(
+                                curve: Curves.ease,
+                                delay: 1.2,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Text(
+                                    'Quick Service',
+                                    style: poppinsLight.copyWith(
+                                      fontSize: 15.0,
+                                      color: AppColors.greyColor,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          );
-                        } else {
-                          return SizedBox(
-                            height: MediaQuery.of(context).size.height / 5,
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
+
+                              /// quick services box
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: FadeAnimation(
+                                  curve: Curves.ease,
+                                  delay: 1.2,
+                                  child: SizedBox(
+                                    width: width(context),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12.0),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          QuickServiceBox(
+                                            onTap: () {
+                                              Get.to(const TransferScreen());
+                                            },
+                                            icon: CupertinoIcons
+                                                .arrow_right_arrow_left,
+                                            text: 'Transfer',
+                                          ),
+                                          SizedBox(
+                                              width: height(context) * 0.032),
+                                          QuickServiceBox(
+                                            onTap: () {
+                                              Get.to(const DepositScreen());
+                                            },
+                                            icon: CupertinoIcons.arrow_down,
+                                            text: 'Deposit',
+                                          ),
+                                          SizedBox(
+                                              width: height(context) * 0.032),
+                                          QuickServiceBox(
+                                            onTap: () {
+                                              Get.to(const WithdrawScreen());
+                                            },
+                                            icon: CupertinoIcons.arrow_up,
+                                            text: 'Withdraw',
+                                            borderColor: AppColors.redDarkColor,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          );
-                        }
-                      }),
-                ],
-              ),
-            ),
+
+                              /// click button to Open Bank Account
+                              SizedBox(height: height(context) * 0.008),
+                              FadeAnimation(
+                                curve: Curves.ease,
+                                delay: 1.2,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Text(
+                                    'Click Button Below To Open Bank Account',
+                                    style: poppinsLight.copyWith(
+                                      fontSize: 15.0,
+                                      color: AppColors.greyColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(height: height(context) * 0.016),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    OpenAccountButton(
+                                      onTap: () {
+                                        Get.to(const OpenAccountScreen());
+                                      },
+                                      icon: Icons.lock,
+                                      text: 'Private Account',
+                                    ),
+                                    OpenAccountButton(
+                                      onTap: () {
+                                        Get.to(const OpenJointAccountScreen());
+                                      },
+                                      icon: Icons.lock,
+                                      text: 'Joint Account',
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              /// Transaction history texts
+                              SizedBox(height: height(context) * 0.016),
+                              FadeAnimation(
+                                curve: Curves.ease,
+                                delay: 1.3,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Text(
+                                    'Transaction History',
+                                    style: poppinsLight.copyWith(
+                                      fontSize: 15.0,
+                                      color: AppColors.greyColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              FadeAnimation(
+                                curve: Curves.ease,
+                                delay: 1.3,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Text(
+                                    'For more detailed version visit individual account page.',
+                                    style: poppinsLight.copyWith(
+                                      fontSize: 10.0,
+                                      color: Colors.grey[200],
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              /// list of transactions
+                              const SizedBox(height: 10.0),
+                              StreamBuilder(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('transactions')
+                                      .where('userId',
+                                          isEqualTo: FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                      .snapshots(),
+                                  builder: (context,
+                                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                                    if (snapshot.hasData &&
+                                        snapshot.data!.docs.isNotEmpty) {
+                                      return FadeAnimation(
+                                        curve: Curves.ease,
+                                        delay: 1.3,
+                                        child: ListView.builder(
+                                          shrinkWrap: true,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          padding: const EdgeInsets.only(
+                                              bottom: 50.0),
+                                          itemCount: snapshot.data!.docs.length,
+                                          itemBuilder: (context, index) {
+                                            return TransactionCardBox(
+                                              transactionType:
+                                                  snapshot.data!.docs[index]
+                                                      ['transactionType'],
+                                              moneyColor: snapshot
+                                                              .data!.docs[index]
+                                                          ['toAccount'] ==
+                                                      privateAccount.accountName
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                              amount: snapshot
+                                                  .data!.docs[index]['amount']
+                                                  .toString(),
+                                              fromAccount: snapshot.data!
+                                                  .docs[index]['fromAccount'],
+                                              toAccount: snapshot.data!
+                                                  .docs[index]['toAccount'],
+                                              transactionDate:
+                                                  snapshot.data!.docs[index]
+                                                      ['transactionDate'],
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    }
+                                    if (snapshot.hasData &&
+                                        snapshot.data!.docs.isEmpty) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 10),
+                                        child: SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              4.8,
+                                          child: Center(
+                                            child: Text(
+                                              'No Transactions till now',
+                                              style: poppinsRegular.copyWith(
+                                                fontSize: 12.0,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height /
+                                                5,
+                                        child: const Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'No Accounts Exist',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.red,
+                        strokeWidth: 1,
+                      ),
+                    );
+                  }
+                })),
           ],
         ),
       ),

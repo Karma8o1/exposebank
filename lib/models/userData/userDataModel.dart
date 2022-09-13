@@ -20,7 +20,8 @@ class UserData {
       countryOfResidence,
       regionOrProvince,
       town,
-      profile;
+      profile,
+      id;
   UserData({
     required this.phoneNumber,
     required this.firstName,
@@ -42,6 +43,7 @@ class UserData {
     required this.regionOrProvince,
     required this.town,
     required this.profile,
+    required this.id,
   });
   @override
   List<Object?> get props => [
@@ -65,9 +67,11 @@ class UserData {
         regionOrProvince,
         town,
         profile,
+        id,
       ];
   static UserData fromJson(DocumentSnapshot snapshot) {
     UserData userData = UserData(
+      id: snapshot.id,
       phoneNumber: snapshot['phoneNumber'],
       firstName: snapshot['firstName'],
       lastName: snapshot['lastName'],

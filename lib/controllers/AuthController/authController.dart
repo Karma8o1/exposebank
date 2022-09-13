@@ -1,4 +1,6 @@
+import 'package:expose_banq/controllers/accountController/account_controller.dart';
 import 'package:expose_banq/main.dart';
+import 'package:expose_banq/view/auth/pin/sign_up_pin.dart';
 import 'package:expose_banq/view/wrapper/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -167,7 +169,15 @@ class AuthController {
             'nicBack': cnicBack,
             'isSuspended': false,
             'isBanned': false,
-          }).then((value) => Get.off(const Wrapper()));
+          }).then((value) {
+            AccountController.createNewAccounts(
+                    accountName: email.contains('@gmail.com')
+                        ? email.replaceAll('@gmail.com', '')
+                        : email.replaceAll('.com', ''),
+                    phoneNumber: phoneNumber,
+                    context: context)
+                .then((value) => Get.off(const Wrapper()));
+          });
         });
       },
       verificationFailed: (auth.FirebaseAuthException e) {
@@ -196,19 +206,34 @@ class AuthController {
                   contentPadding: EdgeInsets.zero,
                   clipBehavior: Clip.antiAliasWithSaveLayer,
                   content: SizedBox(
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    child: LoginPinScreen(
-                      verificationId: verificationId,
-                      //this stores data to firestore upon registration
-                      storeData: true,
-                      email: email,
-                      firstName: firstName,
-                      pinCode: pinCode,
-                      phoneNumber: phoneNumber,
-                      username: username,
-                    ),
-                  ));
+                      height: MediaQuery.of(context).size.height,
+                      width: MediaQuery.of(context).size.width,
+                      child: SignUpPinScreen(
+                        verificationId: verificationId,
+                        phoneNumber: phoneNumber,
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email,
+                        username: username,
+                        pinCode: pinCode,
+                        dateOfBirth: dateOfBirth,
+                        placeOfBirth: placeOfBirth,
+                        sex: sex,
+                        nationality: nationality,
+                        martialStatus: martialStatus,
+                        motherLastName: motherLastName,
+                        nationCardNumber: nationCardNumber,
+                        nicOrPassportIssueDate: nicOrPassportIssueDate,
+                        nicOrPassportExpiryDate: nicOrPassportExpiryDate,
+                        profession: profession,
+                        countryOfResidence: countryOfResidence,
+                        regionOrProvince: regionOrProvince,
+                        town: town,
+                        profile: profile,
+                        cnicFront: cnicFront,
+                        cnicBack: cnicBack,
+                        token: verificationId,
+                      )));
             });
       },
       codeAutoRetrievalTimeout: (String verificationId) {},

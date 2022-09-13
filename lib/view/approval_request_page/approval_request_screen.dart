@@ -1,4 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elegant_notification/elegant_notification.dart';
+import 'package:expose_banq/models/requestModel/request_model.dart';
 import 'package:expose_banq/view/payment_transfer/approval_request_two.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -39,12 +43,7 @@ class _ApprovalRequestScreenState extends State<ApprovalRequestScreen> {
         height: height(context),
         width: width(context),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 30.0,
-            ),
             Padding(
               padding: const EdgeInsets.only(left: 24.0),
               child: Text(
@@ -55,28 +54,52 @@ class _ApprovalRequestScreenState extends State<ApprovalRequestScreen> {
                 ),
               ),
             ),
-            VerifyBox(
-              isVerify: true,
-              userNameText: 'John Fonesca',
-              paymentValueText: '+ ₦1,800,400',
-              onTap: () {
-                Get.to(const ApprovalRequestVerificationScreen());
-              },
-            ),
-            VerifyBox(
-              isVerify: true,
-              userNameText: 'John Fonesc',
-              paymentValueText: '+ ₦1,800,400',
-              onTap: () {
-                Get.to(const ApprovalRequestTwoScreen());
-              },
-            ),
-            VerifyBox(
-              isVerify: false,
-              userNameText: 'MTN Airtime Topup',
-              paymentValueText: '- ₦2,500',
-              onTap: () {},
-            ),
+            StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('requests')
+                    .where('recieverRef',
+                        isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                    .snapshots(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                    return Expanded(
+                      child: ListView.builder(
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, int index) {
+                            return VerifyBox(
+                              isVerify: true,
+                              userNameText: snapshot.data!.docs[index]
+                                  ['accountName'],
+                              paymentValueText: snapshot.data!.docs[index]
+                                  ['isPermissionGranted'],
+                              onTap: () {
+                                if (snapshot.data!.docs[index]
+                                        ['isPermissionGranted'] ==
+                                    'Awaited') {
+                                  Get.to(ApprovalRequestVerificationScreen(
+                                    request: RequestModel.fromSnapshot(
+                                        snapshot.data!.docs[index]),
+                                  ));
+                                } else {
+                                  ElegantNotification.info(
+                                      title: Text(
+                                          'Request ${snapshot.data!.docs[index]['isPermissionGranted']}'),
+                                      description: Text(
+                                          'The request has already been: ${snapshot.data!.docs[index]['isPermissionGranted']}'));
+                                }
+                              },
+                            );
+                          }),
+                    );
+                  } else {
+                    return Center(
+                      child: Text(
+                        'No requests yet!',
+                        style: poppinsLight.copyWith(fontSize: 14),
+                      ),
+                    );
+                  }
+                }),
           ],
         ),
       ),

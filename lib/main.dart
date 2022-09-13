@@ -10,12 +10,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twilio_flutter/twilio_flutter.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:flutter_config/flutter_config.dart';
+// import 'package:flutter_config/flutter_config.dart';
 
 import 'view/starter/splash_screen.dart';
 
@@ -107,7 +106,7 @@ late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FlutterConfig.loadEnvVariables();
+  // await FlutterConfig.loadEnvVariables();
   prefs = await SharedPreferences.getInstance();
   permission = prefs.getBool('askForPermission') ?? true;
   lang = prefs.getBool('language') ?? true;
@@ -119,11 +118,7 @@ Future<void> main() async {
     locale = const Locale('fr', 'FR');
   }
   showOnboardingScreen = prefs.getBool('showOnboardingScreen') ?? true;
-  if (permission) {
-    //asks user for permission to use gallery and camera
-    await Permission.photos.request();
-    await Permission.camera.request();
-  }
+  
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
   canAuthenticate =
@@ -132,14 +127,16 @@ Future<void> main() async {
   if (!kIsWeb) {
     await setupFlutterNotifications();
   }
+//   accountSidTwillio=ACd007b19e430cd677ddb854c507d84e10
+// authTokenTwillio=c0096727c19bfa30a07371bf3e98598c
+// twilioNumber=+15074797332
   //initializing twillio config for user to recieve message upon forgetting pin
   twilioFlutter = TwilioFlutter(
-      accountSid: FlutterConfig.get(
-          'accountSidTwillio'), // replace *** with Account SID
+      accountSid:
+          'ACd007b19e430cd677ddb854c507d84e10', // replace *** with Account SID
       authToken:
-          FlutterConfig.get('authTokenTwillio'), // replace xxx with Auth Token
-      twilioNumber:
-          FlutterConfig.get('twilioNumber') // replace .... with Twilio Number
+          'c0096727c19bfa30a07371bf3e98598c', // replace xxx with Auth Token
+      twilioNumber: '+15074797332' // replace .... with Twilio Number
       );
   runApp(const MyApp());
 }

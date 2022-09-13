@@ -1,24 +1,32 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expose_banq/view/activity_detail/activity_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../../../const/exports.dart';
 
 class TransactionCardBox extends StatelessWidget {
- final String? transactionType;
- final Color? moneyColor;
- final VoidCallback? onTap;
+  final String? transactionType, amount, fromAccount, toAccount;
+  final Timestamp transactionDate;
+  final Color? moneyColor;
+  final VoidCallback? onTap;
 
- const TransactionCardBox({Key? key,
-   required this.transactionType,
-   required this.moneyColor,
-   this.onTap,
-}) : super(key: key);
+  TransactionCardBox({
+    Key? key,
+    required this.transactionType,
+    required this.moneyColor,
+    required this.amount,
+    required this.fromAccount,
+    this.onTap,
+    required this.toAccount,
+    required this.transactionDate,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         Get.to(const ActivityDetailScreen());
       },
       child: Container(
@@ -33,7 +41,11 @@ class TransactionCardBox extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Icon(Icons.food_bank, color: AppColors.greyColor, size: 32.0,),
+            const Icon(
+              Icons.food_bank,
+              color: AppColors.greyColor,
+              size: 32.0,
+            ),
             const SizedBox(width: 16.0),
             Expanded(
               child: Column(
@@ -44,13 +56,18 @@ class TransactionCardBox extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Go For Rewards',
-                        style: poppinsRegular.copyWith(
-                          fontSize: 20.0,
-                          color: AppColors.whiteColor,
+                      Container(
+                        width: 150,
+                        child: Text(
+                          'Reciever: ${toAccount.toString()}',
+                          style: poppinsRegular.copyWith(
+                            fontSize: 16.0,
+                            color: AppColors.whiteColor,
+                          ),
                         ),
                       ),
-                      Text('XAF 50.00',
+                      Text(
+                        'XAF ${amount}',
                         style: poppinsRegular.copyWith(
                           fontSize: 14.0,
                           color: moneyColor,
@@ -58,18 +75,30 @@ class TransactionCardBox extends StatelessWidget {
                       ),
                     ],
                   ),
+                  Text(
+                    'Sender: ${fromAccount.toString()}',
+                    style: poppinsRegular.copyWith(
+                      fontSize: 16.0,
+                      color: AppColors.whiteColor,
+                    ),
+                  ),
                   const SizedBox(height: 5.0),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(transactionType!,
+                      Text(
+                        transactionType!,
                         style: poppinsRegular.copyWith(
                           fontSize: 14.0,
                           color: AppColors.greyColor,
                         ),
                       ),
-                      Text('29/6/2022',
+                      Text(
+                        DateFormat('dd/MM/yy')
+                            .format(DateTime.fromMillisecondsSinceEpoch(
+                          transactionDate.millisecondsSinceEpoch,
+                        )),
                         style: poppinsRegular.copyWith(
                           fontSize: 12.0,
                           color: AppColors.greyColor,

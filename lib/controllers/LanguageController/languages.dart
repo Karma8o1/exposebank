@@ -21,6 +21,10 @@ class LanguageController extends Translations {
           'T&C': 'Terms And Conditions',
           'P&P': 'Privcay Policy',
           'Logout': 'Logout',
+          'jointsecurity': 'TIGHT SECURITY JOINT BANK ACCOUNT, FREE.',
+          'hardmoney':
+              "Ain\'t Nobody Do Away With Your Hard Earning Money!\n This Is The Best Form Of Trust & Transparency",
+              'request': 'You are requested by the admins of group bank account to verify the activity below!',
         },
         'fr_FR': {
           'language': "Le français est utilisé comme langue de l'application.",
@@ -40,6 +44,10 @@ class LanguageController extends Translations {
           'T&C': 'Termes et conditions',
           'P&P': 'Politique de confidentialité',
           'Logout': "Se déconnecter",
+          'jointsecurity': 'COMPTE BANCAIRE COMMUN SÉCURISÉ, GRATUIT.',
+          'hardmoney':
+              "Personne ne vous enlève votre argent durement gagné !\n C'est la meilleure forme de confiance et de transparence",
+              'request': "Les administrateurs du compte bancaire du groupe vous demandent de vérifier l'activité ci-dessous !"
         }
       };
 }

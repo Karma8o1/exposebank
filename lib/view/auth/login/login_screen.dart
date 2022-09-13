@@ -204,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: height(context) * 0.01),
                 TextButton(
                   onPressed: () {
-                    Get.to(const SignupScreen());
+                    Get.off(const SignupScreen());
                   },
                   child: Text(
                     'Signup',

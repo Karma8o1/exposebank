@@ -5,6 +5,7 @@ import 'package:expose_banq/controllers/AuthController/authController.dart';
 import 'package:expose_banq/controllers/biometric/biometricController.dart';
 import 'package:expose_banq/controllers/userDataController/userDataController.dart';
 import 'package:expose_banq/main.dart';
+import 'package:expose_banq/models/jointAccountModel/joint_account_model.dart';
 import 'package:expose_banq/models/privateAccountModel/private_account_model.dart';
 import 'package:expose_banq/models/userData/userDataModel.dart';
 import 'package:expose_banq/view/bank_account/bank_account_screen.dart';
@@ -79,9 +80,11 @@ class _DrawerScreenState extends State<DrawerScreen> {
 }
 
 class DrawerOneScreen extends StatefulWidget {
-  DrawerOneScreen({Key? key, required this.privateAccount}) : super(key: key);
-  PrivateAccountModel privateAccount;
-
+  DrawerOneScreen(
+      {Key? key, required this.accountName, required this.accountType})
+      : super(key: key);
+  String accountName;
+  String accountType;
   @override
   State<DrawerOneScreen> createState() => _DrawerOneScreenState();
 }
@@ -95,7 +98,8 @@ class _DrawerOneScreenState extends State<DrawerOneScreen> {
       controller: zoomDrawerController,
       menuScreen: const MenuScreen(),
       mainScreen: BankAccountPage(
-        privateAccount: widget.privateAccount,
+        accountName: widget.accountName,
+        accountType: widget.accountType,
       ),
       clipMainScreen: false,
       borderRadius: 24.0,

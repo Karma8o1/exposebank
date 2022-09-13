@@ -1,3 +1,9 @@
+// ignore_for_file: must_be_immutable
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elegant_notification/elegant_notification.dart';
+import 'package:expose_banq/const/loading.dart';
+import 'package:expose_banq/models/requestModel/request_model.dart';
 import 'package:expose_banq/view/payment_transfer/field_screen.dart';
 import 'package:expose_banq/view/payment_transfer/success_screen.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +12,11 @@ import 'package:get/get.dart';
 import '../../const/exports.dart';
 
 class ApprovalRequestVerificationScreen extends StatefulWidget {
-  const ApprovalRequestVerificationScreen({Key? key}) : super(key: key);
-
+  ApprovalRequestVerificationScreen({
+    Key? key,
+    required this.request,
+  }) : super(key: key);
+  RequestModel request;
   @override
   State<ApprovalRequestVerificationScreen> createState() =>
       _ApprovalRequestVerificationScreenState();
@@ -50,7 +59,6 @@ class _ApprovalRequestVerificationScreenState
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-
               /// top desc texts
               SizedBox(
                 height: height(context) * 0.03,
@@ -58,8 +66,7 @@ class _ApprovalRequestVerificationScreenState
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Text(
-                  'You are requested by the admins of group bank '
-                  'account to verify the activity below!',
+                  'request'.tr,
                   style: poppinsMedium.copyWith(
                     fontSize: 20.0,
                     color: AppColors.greyColor,
@@ -70,26 +77,6 @@ class _ApprovalRequestVerificationScreenState
               /// available
               SizedBox(
                 height: height(context) * 0.08,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Available: XAF',
-                    style: poppinsLight.copyWith(
-                      fontSize: 16.0,
-                      color: AppColors.greyColor,
-                    ),
-                  ),
-                  Text(
-                    ' 3,150.70',
-                    style: poppinsMedium.copyWith(
-                      fontSize: 16.0,
-                      color: AppColors.whiteColor,
-                    ),
-                  ),
-                ],
               ),
 
               /// amount field
@@ -108,7 +95,7 @@ class _ApprovalRequestVerificationScreenState
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hintText: 'XAF 1,360.00',
+                    hintText: 'XAF 0',
                     hintStyle: poppinsRegular.copyWith(
                       fontSize: 38.0,
                       color: AppColors.greyColor,
@@ -131,7 +118,7 @@ class _ApprovalRequestVerificationScreenState
                     ),
                   ),
                   Text(
-                    ' XAF 3.30',
+                    ' XAF 0',
                     style: poppinsMedium.copyWith(
                       fontSize: 16.0,
                       color: AppColors.whiteColor,
@@ -156,7 +143,44 @@ class _ApprovalRequestVerificationScreenState
                   btnHeight: 55.0,
                   btnText: 'Approve',
                   onTap: () {
-                   Get.to(SuccessScreen());
+                    showLoading(context);
+                    FirebaseFirestore.instance
+                        .collection('jointAccount')
+                        .doc(widget.request.accountName)
+                        .set({
+                      'accountName': widget.request.accountName,
+                      'balance': 0,
+                      'isSuspended': false,
+                      'typeOfAccount': widget.request.accountType,
+                      'partners': [
+                        widget.request.senderRef,
+                        widget.request.recieverRef
+                      ],
+                      'isCardIssued': false,
+                      'creationDate': Timestamp.fromDate(DateTime.now()),
+                    }).then((value) {
+                      FirebaseFirestore.instance
+                          .collection('requests')
+                          .doc(
+                            widget.request.id,
+                          )
+                          .update({'isPermissionGranted': 'Granted'}).then(
+                              (value) {
+                        ElegantNotification.success(
+                                title: Text('Permission granted'),
+                                description: Text(
+                                    'Joint account has been created with name ${widget.request.accountName}'))
+                            .show(context);
+                      });
+                      Get.to(SuccessScreen());
+                    }).onError((error, stackTrace) {
+                      ElegantNotification.error(
+                          title: Text('Permission Denied'),
+                          description: Text(
+                            'Permission to create joint account has been denied.',
+                          )).show(context);
+                      Get.back();
+                    });
                   },
                   btnColorOne: AppColors.violetColor,
                   btnColorTwo: AppColors.violetColor,
@@ -174,7 +198,24 @@ class _ApprovalRequestVerificationScreenState
                   btnHeight: 55.0,
                   btnText: 'Decline',
                   onTap: () {
-                    Get.to(FailedScreen());
+                    try {
+                      showLoading(context);
+                      FirebaseFirestore.instance
+                          .collection('requests')
+                          .doc(widget.request.id)
+                          .update({'isPermissionGranted': 'Denied'}).then(
+                              (value) {
+                        Get.back();
+                      }).onError((error, stackTrace) {
+                        Get.back();
+                      });
+                    } on FirebaseException catch (e) {
+                      Get.to(FailedScreen());
+                      ElegantNotification.error(
+                          description: Text(
+                        'Something went wrong. Please check your internet connection.',
+                      )).show(context);
+                    }
                   },
                   btnColorOne: AppColors.redDarkColor,
                   btnColorTwo: AppColors.redDarkColor,

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elegant_notification/elegant_notification.dart';
 import 'package:expose_banq/const/loading.dart';
 import 'package:expose_banq/controllers/AuthController/authController.dart';
 import 'package:expose_banq/main.dart';
@@ -223,19 +224,52 @@ class _SignupScreenState extends State<SignupScreen> {
                             showVerification = false;
                           });
                           //kyc screen or know your customer
-                          Get.to(
-                            KYCScreen(
-                              email: emailController.text,
-                              phoneNumber: phoneNumberController.text,
-                              pin: pinCodeController.text,
-                              userName: usernameController.text,
-                            ),
-                            duration: const Duration(seconds: 2),
-                            transition: Transition.rightToLeft,
-                          );
-                          //information drilled to KYC form so the regsitration could be done after
-                          //KYC form is filled
+                          FirebaseFirestore.instance
+                              .collection('userData')
+                              .where('userName',
+                                  isEqualTo: usernameController.text)
+                              .get()
+                              .then((value) {
+                            if (value.docs.isNotEmpty) {
+                              ElegantNotification.error(
+                                      title: Text('Username already taken. '),
+                                      description:
+                                          Text('Username must be unique.'))
+                                  .show(context);
+                              return;
+                            } else {
+                              FirebaseFirestore.instance
+                                  .collection('userData')
+                                  .where('phoneNumber',
+                                      isEqualTo: phoneNumberController.text)
+                                  .get()
+                                  .then((value) {
+                                if (value.docs.isNotEmpty) {
+                                  ElegantNotification.error(
+                                          title:
+                                              Text('Phone number registered'),
+                                          description: Text(
+                                              'Phone number is already registered and in use. If it is you, please login.'))
+                                      .show(context);
+                                  return;
+                                } else {
+                                  Get.to(
+                                    KYCScreen(
+                                      email: emailController.text,
+                                      phoneNumber: phoneNumberController.text,
+                                      pin: pinCodeController.text,
+                                      userName: usernameController.text,
+                                    ),
+                                    duration: const Duration(seconds: 2),
+                                    transition: Transition.rightToLeft,
+                                  );
+                                  //information drilled to KYC form so the regsitration could be done after
+                                  //KYC form is filled
 
+                                }
+                              });
+                            }
+                          });
                         }
                       },
                     ),
@@ -266,7 +300,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   SizedBox(height: height(context) * 0.01),
                   TextButton(
                     onPressed: () {
-                      Get.back();
+                      Get.off(LoginScreen());
                     },
                     child: Text(
                       'Login Here',

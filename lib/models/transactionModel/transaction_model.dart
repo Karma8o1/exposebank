@@ -5,8 +5,6 @@ class TransactionModel {
   //from user is the reference to the data of user send money
   String fromUser;
   String toAccount;
-  //ref of the user money is sent to
-  String toUser;
   //Amount of money sent
   int amount;
   //if the account is current.saving etc.
@@ -20,7 +18,6 @@ class TransactionModel {
     required this.transactionType,
     required this.amount,
     required this.toAccount,
-    required this.toUser,
     required this.typeOfAccount,
     required this.timeOfTransaction,
   });

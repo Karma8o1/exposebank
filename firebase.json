@@ -10,9 +10,7 @@
       "firebase-debug.log",
       "firebase-debug.*.log"
     ],
-    "predeploy": [
-      "npm --prefix \"$RESOURCE_DIR\" run lint"
-    ]
+    "predeploy": []
   },
   "storage": {
     "rules": "storage.rules"

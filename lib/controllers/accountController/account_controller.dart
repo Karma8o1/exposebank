@@ -30,6 +30,7 @@ class AccountController {
           'isSuspended': false,
           'isCardIssued': false,
           'creationDate': Timestamp.fromDate(DateTime.now()),
+          'isVerified': true,
         }).then((value) {
           return ElegantNotification.success(
             title: const Text('Account Created'),

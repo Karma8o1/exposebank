@@ -1,24 +1,36 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class JointAccountModel {
-  String accountNumber;
   String accountName;
   int balance;
+  String id;
   bool isSuspended;
 
   //if the account is current.saving etc.
   String typeOfAccount;
-  bool isBanned;
   //uid of the partners private data
-  List<String> partners;
+  List partners;
 
   bool isCardIssued;
   JointAccountModel({
-    required this.accountNumber,
     required this.accountName,
     required this.typeOfAccount,
+    required this.id,
     required this.balance,
-    required this.isBanned,
     required this.isSuspended,
     required this.partners,
     required this.isCardIssued,
   });
+  static JointAccountModel fromSnapshot(DocumentSnapshot snapshot) {
+    JointAccountModel jointAccount = JointAccountModel(
+      id: snapshot.id,
+      accountName: snapshot['accountName'],
+      typeOfAccount: snapshot['typeOfAccount'],
+      balance: snapshot['balance'],
+      isSuspended: snapshot['isSuspended'],
+      partners: snapshot['partners'],
+      isCardIssued: snapshot['isCardIssued'],
+    );
+    return jointAccount;
+  }
 }

@@ -639,6 +639,7 @@ class _KYCScreenState extends State<KYCScreen> {
                     //registers user to firebase and stores the collected data.
                     if (_formKey.currentState!.validate()) {
                       showLoading(context);
+                      
                       AuthController.registerUser(
                         phoneNumber: widget.phoneNumber,
                         firstName: firstNameController.text.trim(),

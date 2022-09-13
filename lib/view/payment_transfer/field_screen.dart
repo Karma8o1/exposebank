@@ -53,11 +53,17 @@ class _FailedScreenState extends State<FailedScreen> {
                     color: AppColors.redDarkColor,
                   ),
                   child: const Center(
-                    child: Icon(Icons.close, color: AppColors.whiteColor,),
+                    child: Icon(
+                      Icons.close,
+                      color: AppColors.whiteColor,
+                    ),
                   ),
                 ),
-                SizedBox(height: height(context) * 0.03,),
-                Text('Sorry, Tansaction failed!',
+                SizedBox(
+                  height: height(context) * 0.03,
+                ),
+                Text(
+                  'Sorry, Tansaction failed!',
                   style: poppinsLight.copyWith(
                     fontSize: 13.0,
                     color: AppColors.greyColor,
@@ -66,7 +72,8 @@ class _FailedScreenState extends State<FailedScreen> {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 30.0),
+              padding:
+                  const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 30.0),
               child: CustomGradientButton(
                 borderRadius: 16.0,
                 btnHeight: 55.0,

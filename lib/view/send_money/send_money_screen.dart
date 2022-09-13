@@ -243,7 +243,7 @@ class _SendMoneyScreenState extends State<SendMoneyScreen> {
             Center(
               child: InkWell(
                 onTap: () {
-                  Get.to(const SecurityScreen());
+                  // Get.to(const SecurityScreen());
                 },
                 borderRadius: BorderRadius.circular(40.0),
                 child: Ink(

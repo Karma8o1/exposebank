@@ -1,10 +1,13 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:expose_banq/models/jointAccountModel/joint_account_model.dart';
 import 'package:expose_banq/models/privateAccountModel/private_account_model.dart';
 import 'package:expose_banq/models/transactionModel/transaction_model.dart';
 import 'package:expose_banq/view/approval_request_page/approval_request_screen.dart';
 import 'package:expose_banq/widgets/fade_animation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +23,11 @@ import '../payment_transfer/transfer_screen.dart';
 import '../withdraw/withdraw_screen.dart';
 
 class BankAccountPage extends StatefulWidget {
-  BankAccountPage({Key? key, required this.privateAccount}) : super(key: key);
-  PrivateAccountModel privateAccount;
+  BankAccountPage(
+      {Key? key, required this.accountName, required this.accountType})
+      : super(key: key);
+  String accountName;
+  String accountType;
 
   @override
   State<BankAccountPage> createState() => _BankAccountPageState();
@@ -73,19 +79,6 @@ class _BankAccountPageState extends State<BankAccountPage> {
           padding: EdgeInsets.only(left: 45.0),
           child: AppNameWidget(),
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 22.0,
-              backgroundColor: AppColors.redDarkColor,
-              child: CircleAvatar(
-                radius: 20.0,
-                backgroundImage: AssetImage(AppImages.userImage),
-              ),
-            ),
-          ),
-        ],
       ),
 
       /// body
@@ -106,61 +99,26 @@ class _BankAccountPageState extends State<BankAccountPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      'Hi, ${widget.privateAccount.accountName}',
+                      'Hi, ${widget.accountName}',
                       style: poppinsRegular.copyWith(
                         fontSize: 20.0,
                         color: AppColors.whiteColor,
-                      ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      onPressed: () {
-                        Get.to(const ApprovalRequestScreen());
-                      },
-                      icon: Stack(
-                        children: [
-                          const Icon(
-                            Icons.notifications,
-                            color: AppColors.whiteColor,
-                            size: 28.0,
-                          ),
-                          Positioned(
-                            top: 0.0,
-                            right: 0.0,
-                            child: Container(
-                              height: 12.0,
-                              width: 12.0,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.redDarkColor,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '0',
-                                  style: poppinsLight.copyWith(
-                                    fontSize: 8.0,
-                                    color: AppColors.whiteColor,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   ],
                 ),
               ),
             ),
+            FadeAnimation(
+                curve: Curves.fastLinearToSlowEaseIn,
+                delay: 0.7,
+                child: BankCardWidget(
+                  accountName: widget.accountName,
+                  accountType: widget.accountType,
+                )),
 
             /// Bank Card
-            FadeAnimation(
-              curve: Curves.fastLinearToSlowEaseIn,
-              delay: 0.7,
-              child: BankCardWidget(
-                balance: widget.privateAccount.balance.toString(),
-              ),
-            ),
+
             const SizedBox(height: 24.0),
 
             Container(
@@ -257,10 +215,13 @@ class _BankAccountPageState extends State<BankAccountPage> {
 
                   /// list of transactions
                   const SizedBox(height: 10.0),
+
                   StreamBuilder(
                       stream: FirebaseFirestore.instance
                           .collection('transactions')
-                          .snapshots(),
+                          .where('accounts', arrayContainsAny: [
+                        widget.accountName
+                      ]).snapshots(),
                       builder:
                           ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
                         if (snapshot.data!.docs.isNotEmpty &&
@@ -275,22 +236,37 @@ class _BankAccountPageState extends State<BankAccountPage> {
                               itemCount: snapshot.data!.docs.length,
                               itemBuilder: (context, index) {
                                 return TransactionCardBox(
-                                  transactionType: transTypeTexts[index],
-                                  moneyColor: textColors[index],
+                                  transactionType: snapshot.data!.docs[index]
+                                      ['transactionType'],
+                                  moneyColor: snapshot.data!.docs[index]
+                                              ['toAccount'] ==
+                                          widget.accountName
+                                      ? Colors.green
+                                      : Colors.red,
+                                  amount: snapshot.data!.docs[index]['amount']
+                                      .toString(),
+                                  fromAccount: snapshot.data!.docs[index]
+                                      ['fromAccount'],
+                                  toAccount: snapshot.data!.docs[index]
+                                      ['toAccount'],
+                                  transactionDate: snapshot.data!.docs[index]
+                                      ['transactionDate'],
                                 );
                               },
                             ),
                           );
                         }
-                        if (snapshot.data!.docs.isNotEmpty &&
-                            snapshot.hasData) {
-                          return const Center(
-                            child: Text(
-                              'No transaction in this account. Yet!',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                        if (snapshot.data!.docs.isEmpty && snapshot.hasData) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            child: const Center(
+                              child: Text(
+                                'No transaction in this account. Yet!',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           );

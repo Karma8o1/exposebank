@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elegant_notification/elegant_notification.dart';
 import 'package:expose_banq/view/wrapper/wrapper.dart';
 import 'package:expose_banq/widgets/lib/src/flutter_pin_code_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -88,54 +89,17 @@ class _LoginPinScreenState extends State<LoginPinScreen> {
                 ),
                 emptyIndicatorColor: AppColors.blackLightColor,
                 filledIndicatorColor: AppColors.parrotColor,
-                // leftBottomWidget: GestureDetector(
-                //   onTap: (){
-
-                //   },
-                //   child: Container(
-                //     margin: const EdgeInsets.all(15.0),
-                //     decoration: BoxDecoration(
-                //       shape: BoxShape.circle,
-                //       color: AppColors.blackColor,
-                //       border: Border.all(
-                //         color: AppColors.blackLightColor,
-                //         width: 1.0,
-                //       ),
-                //     ),
-                //     child: Center(
-                //       child: SvgPicture.asset(AppImages.touchBtnImage),
-                //     ),
-                //   ),
-                // ),
                 onFullPin: (value, _) async {
-                  PhoneAuthCredential credential = PhoneAuthProvider.credential(
-                      verificationId: widget.verificationId,
-                      smsCode: value.toString());
                   try {
-                    await FirebaseAuth.instance
-                        .signInWithCredential(credential)
-                        .then((value) async {
-                      //stores data to firestore database entered by user
-                      widget.storeData
-                          ? await FirebaseFirestore.instance
-                              .collection('userData')
-                              .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .set({
-                              'firstName': widget.firstName,
-                              'emailAddress': widget.email,
-                              'phoneNumber': widget.phoneNumber,
-                              'userName': widget.username,
-                              'pinCode': widget.pinCode,
-                            }).then((value) {
-                              Get.off(const Wrapper());
-                            })
-                          : ({Get.off(const Wrapper())});
-                    });
-                  } catch (e) {
-                    print(e.toString());
-                  }
+                    PhoneAuthCredential credential =
+                        PhoneAuthProvider.credential(
+                            verificationId: widget.verificationId,
+                            smsCode: value.toString());
 
-                  // Sign the user in (or link) with the credential
+                    // Sign the user in (or link) with the credential
+                  } catch (e) {
+                    ElegantNotification.error(description: Text(e.toString()));
+                  }
                 },
                 initialPinLength: 6,
                 onChangedPin: (_) {},
@@ -158,25 +122,3 @@ class _LoginPinScreenState extends State<LoginPinScreen> {
     );
   }
 }
-// OtpTextField(
-//                       numberOfFields: 6,
-//                       borderColor: const Color(0xFF512DA8),
-//                       //set to true to show as box or false to show as dash
-//                       showFieldAsBox: true,
-//                       //runs when a code is typed in
-//                       onCodeChanged: (String code) {
-//                         //handle validation or checks here
-//                       },
-//                       //runs when every textfield is filled
-//                       onSubmit: (String verificationCode) async {
-//                         // Create a PhoneAuthCredential with the code
-//                         auth.PhoneAuthCredential credential =
-//                             auth.PhoneAuthProvider.credential(
-//                                 verificationId: verificationId,
-//                                 smsCode: verificationCode);
-
-//                         // Sign the user in (or link) with the credential
-//                         await auth.FirebaseAuth.instance
-//                             .signInWithCredential(credential);
-//                       }, // end onSubmit
-//                     ),

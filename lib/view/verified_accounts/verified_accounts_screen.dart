@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expose_banq/controllers/userDataController/userDataController.dart';
+import 'package:expose_banq/models/jointAccountModel/joint_account_model.dart';
 import 'package:expose_banq/models/privateAccountModel/private_account_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -45,27 +46,26 @@ class _VerifiedAccountsScreenState extends State<VerifiedAccountsScreen> {
       ),
 
       /// body
-      body: SizedBox(
-        height: height(context),
-        width: width(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const SizedBox(height: 36.0),
-            Center(
-              child: Text(
-                'Bank Accounts List',
-                style: poppinsRegular.copyWith(
-                  fontSize: 20.0,
-                  color: AppColors.greyColor,
+      body: GetBuilder<UserDataController>(
+        builder: ((_) {
+          return SizedBox(
+            height: height(context),
+            width: width(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 36.0),
+                Center(
+                  child: Text(
+                    'Private Bank Accounts List',
+                    style: poppinsRegular.copyWith(
+                      fontSize: 20.0,
+                      color: AppColors.greyColor,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 36.0),
-            GetBuilder<UserDataController>(
-              builder: ((_) {
-                return StreamBuilder(
+                StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection('indiAccount')
                         .where(
@@ -89,10 +89,9 @@ class _VerifiedAccountsScreenState extends State<VerifiedAccountsScreen> {
                                         .toString(),
                                     onTap: () {
                                       Get.offAll(DrawerOneScreen(
-                                        privateAccount:
-                                            PrivateAccountModel.fromJSON(
-                                          snapshot.data!.docs[index],
-                                        ),
+                                        accountName:
+                                            snapshot.data!.docs[index].id,
+                                        accountType: 'indiAccount',
                                       ));
                                     },
                                   );
@@ -117,11 +116,73 @@ class _VerifiedAccountsScreenState extends State<VerifiedAccountsScreen> {
                           ),
                         );
                       }
-                    });
-              }),
+                    }),
+                const SizedBox(height: 10.0),
+                Center(
+                  child: Text(
+                    'Joint Bank Accounts List',
+                    style: poppinsRegular.copyWith(
+                      fontSize: 20.0,
+                      color: AppColors.greyColor,
+                    ),
+                  ),
+                ),
+                StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('jointAccount')
+                        .where(
+                      'partners',
+                      arrayContainsAny: [
+                        FirebaseAuth.instance.currentUser!.uid
+                      ],
+                    ).snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                        return Expanded(
+                            child: ListView.builder(
+                                itemCount: snapshot.data!.docs.length,
+                                itemBuilder: (context, int index) {
+                                  return VerifyBox(
+                                    userImagePath: _.userData.profile,
+                                    isVerify: true,
+                                    userNameText: snapshot.data!.docs[index].id,
+                                    paymentValueText: snapshot
+                                        .data!.docs[index]['balance']
+                                        .toString(),
+                                    onTap: () {
+                                      Get.offAll(DrawerOneScreen(
+                                        accountName:
+                                            snapshot.data!.docs[index].id,
+                                        accountType: 'jointAccount',
+                                      ));
+                                    },
+                                  );
+                                }));
+                      }
+                      if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No Accounts Exist',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.red,
+                            strokeWidth: 1,
+                          ),
+                        );
+                      }
+                    }),
+              ],
             ),
-          ],
-        ),
+          );
+        }),
       ),
     );
   }

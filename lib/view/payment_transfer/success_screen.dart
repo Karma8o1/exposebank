@@ -56,8 +56,11 @@ class _SuccessScreenState extends State<SuccessScreen> {
                     child: SvgPicture.asset(AppIcons.checkIcon),
                   ),
                 ),
-                SizedBox(height: height(context) * 0.03,),
-                Text('Great Job!',
+                SizedBox(
+                  height: height(context) * 0.03,
+                ),
+                Text(
+                  'Great Job!',
                   style: poppinsLight.copyWith(
                     fontSize: 13.0,
                     color: AppColors.greyColor,
@@ -66,7 +69,8 @@ class _SuccessScreenState extends State<SuccessScreen> {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 30.0),
+              padding:
+                  const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 30.0),
               child: CustomGradientButton(
                 borderRadius: 16.0,
                 btnHeight: 55.0,

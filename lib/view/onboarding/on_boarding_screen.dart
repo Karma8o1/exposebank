@@ -237,7 +237,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     const SizedBox(width: 4.0),
                     InkWell(
                       onTap: () {
-                        Get.to(LoginScreen());
+                        prefs.setBool('showOnboardingScreen', false);
+                        Get.off(const SignupScreen());
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(5.0),

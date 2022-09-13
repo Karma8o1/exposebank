@@ -50,13 +50,6 @@ class VerifyBox extends StatelessWidget {
                       color: AppColors.blackColor,
                     ),
                   ),
-                  // const SizedBox(height: 4.0),
-                  // Text(timeText!,
-                  //   style: poppinsLight.copyWith(
-                  //     fontSize: 14.0,
-                  //     color: AppColors.greyColor,
-                  //   ),
-                  // ),
                 ],
               ),
             ),
