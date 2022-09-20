@@ -1,5 +1,6 @@
 import 'package:expose_banq/controllers/accountController/account_controller.dart';
 import 'package:expose_banq/main.dart';
+import 'package:expose_banq/models/userData/userDataModel.dart';
 import 'package:expose_banq/view/auth/pin/sign_up_pin.dart';
 import 'package:expose_banq/view/wrapper/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -171,12 +172,12 @@ class AuthController {
             'isBanned': false,
           }).then((value) {
             AccountController.createNewAccounts(
-                    accountName: email.contains('@gmail.com')
-                        ? email.replaceAll('@gmail.com', '')
-                        : email.replaceAll('.com', ''),
-                    phoneNumber: phoneNumber,
-                    context: context)
-                .then((value) => Get.off(const Wrapper()));
+              accountName: email.contains('@gmail.com')
+                  ? email.replaceAll('@gmail.com', '')
+                  : email.replaceAll('.com', ''),
+              phoneNumber: phoneNumber,
+              context: context,
+            ).then((value) => Get.off(const Wrapper()));
           });
         });
       },

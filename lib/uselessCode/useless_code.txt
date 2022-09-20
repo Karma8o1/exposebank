@@ -1,0 +1,206 @@
+// /// bank accounts
+              // Padding(
+              //   padding: const EdgeInsets.only(left: 24.0, right: 8.0),
+              //   child: Row(
+              //     crossAxisAlignment: CrossAxisAlignment.center,
+              //     mainAxisAlignment: MainAxisAlignment.start,
+              //     children: [
+              //       Expanded(
+              //         child: Text(
+              //           'Deposit into Bank Account',
+              //           style: poppinsRegular.copyWith(
+              //             fontSize: 16.0,
+              //             color: AppColors.whiteColor,
+              //           ),
+              //         ),
+              //       ),
+              //       TextButton(
+              //         onPressed: () {},
+              //         child: Text(
+              //           'Add',
+              //           style: poppinsRegular.copyWith(
+              //             fontSize: 13.0,
+              //             color: Colors.blue,
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+
+              // /// personal bank account
+              // WithdrawBoxWidget(
+              //   onTap: () {
+              //     setState(() {
+              //       isPersonal = true;
+              //       isGroup = false;
+              //       isSaving = false;
+              //     });
+
+              //     Get.bottomSheet(
+              //       const ConfirmBottomSheet(
+              //         isWithdraw: false,
+              //       ),
+              //       backgroundColor: AppColors.whiteColor,
+              //       shape: const RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.only(
+              //           topRight: Radius.circular(28.0),
+              //           topLeft: Radius.circular(28.0),
+              //         ),
+              //       ),
+              //       enableDrag: true,
+              //       enterBottomSheetDuration: const Duration(milliseconds: 400),
+              //       exitBottomSheetDuration: const Duration(milliseconds: 400),
+              //     );
+              //   },
+              //   bankBoxColor: AppColors.personalColor,
+              //   bankImagePath: AppImages.personalAccountImage,
+              //   bankNumberText: '**** *** 2878',
+              //   bankTypeText: 'Personal Account',
+              //   checkBox: isPersonal == true
+              //       ? Container(
+              //           height: 22.0,
+              //           width: 22.0,
+              //           decoration: const BoxDecoration(
+              //             shape: BoxShape.circle,
+              //             color: AppColors.checkedColor,
+              //           ),
+              //           child: const Center(
+              //             child: Icon(
+              //               Icons.check,
+              //               size: 14.0,
+              //               color: AppColors.whiteColor,
+              //             ),
+              //           ),
+              //         )
+              //       : Container(
+              //           height: 22.0,
+              //           width: 22.0,
+              //           decoration: BoxDecoration(
+              //             shape: BoxShape.circle,
+              //             color: AppColors.whiteColor,
+              //             border: Border.all(
+              //               width: 2.0,
+              //               color: AppColors.borderColor,
+              //             ),
+              //           ),
+              //         ),
+              // ),
+
+              // /// group bank account
+              // WithdrawBoxWidget(
+              //   onTap: () {
+              //     setState(() {
+              //       isPersonal = false;
+              //       isGroup = true;
+              //       isSaving = false;
+              //     });
+
+              //     Get.bottomSheet(
+              //       const ConfirmBottomSheet(
+              //         isWithdraw: false,
+              //       ),
+              //       backgroundColor: AppColors.whiteColor,
+              //       shape: const RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.only(
+              //           topRight: Radius.circular(28.0),
+              //           topLeft: Radius.circular(28.0),
+              //         ),
+              //       ),
+              //       enableDrag: true,
+              //       enterBottomSheetDuration: const Duration(milliseconds: 400),
+              //       exitBottomSheetDuration: const Duration(milliseconds: 400),
+              //     );
+              //   },
+              //   bankBoxColor: AppColors.groupColor,
+              //   bankImagePath: AppImages.groupAccountImage,
+              //   bankNumberText: '**** *** 3720',
+              //   bankTypeText: 'Group Account',
+              //   checkBox: isGroup == true
+              //       ? Container(
+              //           height: 22.0,
+              //           width: 22.0,
+              //           decoration: const BoxDecoration(
+              //             shape: BoxShape.circle,
+              //             color: AppColors.checkedColor,
+              //           ),
+              //           child: const Center(
+              //             child: Icon(
+              //               Icons.check,
+              //               size: 14.0,
+              //               color: AppColors.whiteColor,
+              //             ),
+              //           ),
+              //         )
+              //       : Container(
+              //           height: 22.0,
+              //           width: 22.0,
+              //           decoration: BoxDecoration(
+              //             shape: BoxShape.circle,
+              //             color: AppColors.whiteColor,
+              //             border: Border.all(
+              //               width: 2.0,
+              //               color: AppColors.borderColor,
+              //             ),
+              //           ),
+              //         ),
+              // ),
+
+              // /// saving bank account
+              // WithdrawBoxWidget(
+              //   onTap: () {
+              //     Get.bottomSheet(
+              //       const ConfirmBottomSheet(
+              //         isWithdraw: false,
+              //       ),
+              //       backgroundColor: AppColors.whiteColor,
+              //       shape: const RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.only(
+              //           topRight: Radius.circular(28.0),
+              //           topLeft: Radius.circular(28.0),
+              //         ),
+              //       ),
+              //       enableDrag: true,
+              //       enterBottomSheetDuration: const Duration(milliseconds: 400),
+              //       exitBottomSheetDuration: const Duration(milliseconds: 400),
+              //     );
+              //     setState(() {
+              //       isPersonal = false;
+              //       isGroup = false;
+              //       isSaving = true;
+              //     });
+              //   },
+              //   isPng: true,
+              //   bankBoxColor: AppColors.savingColor,
+              //   bankImagePath: AppImages.savingAccountImage,
+              //   bankNumberText: '**** *** 3980',
+              //   bankTypeText: 'Saving Account',
+              //   checkBox: isSaving == true
+              //       ? Container(
+              //           height: 22.0,
+              //           width: 22.0,
+              //           decoration: const BoxDecoration(
+              //             shape: BoxShape.circle,
+              //             color: AppColors.checkedColor,
+              //           ),
+              //           child: const Center(
+              //             child: Icon(
+              //               Icons.check,
+              //               size: 14.0,
+              //               color: AppColors.whiteColor,
+              //             ),
+              //           ),
+              //         )
+              //       : Container(
+              //           height: 22.0,
+              //           width: 22.0,
+              //           decoration: BoxDecoration(
+              //             shape: BoxShape.circle,
+              //             color: AppColors.whiteColor,
+              //             border: Border.all(
+              //               width: 2.0,
+              //               color: AppColors.borderColor,
+              //             ),
+              //           ),
+              //         ),
+              // ),

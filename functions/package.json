@@ -15,6 +15,7 @@
   "main": "index.js",
   "dependencies": {
     "@firebase/messaging": "^0.9.16",
+    "axios": "^0.27.2",
     "fcm-node": "^1.6.1",
     "firebase-admin": "^11.0.1",
     "firebase-functions": "^3.23.0",

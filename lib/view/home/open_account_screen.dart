@@ -1,11 +1,20 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:expose_banq/const/loading.dart';
 import 'package:expose_banq/controllers/accountController/account_controller.dart';
 import 'package:expose_banq/controllers/userDataController/userDataController.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart';
 
 import '../../const/exports.dart';
+
+final DateTime dateTime = DateTime.now();
 
 class OpenAccountScreen extends StatefulWidget {
   const OpenAccountScreen({Key? key}) : super(key: key);
@@ -163,14 +172,15 @@ class _OpenAccountScreenState extends State<OpenAccountScreen> {
 
                 return InkWell(
                   onTap: () {
+                    
                     try {
-                      showLoading(context);
+                      //   // showLoading(context);
+
                       AccountController.createNewAccounts(
-                              accountName: accountNameController.text,
-                              phoneNumber:
-                                  _.userData.phoneNumber.replaceAll('+', ''),
-                              context: context)
-                          .then((value) {
+                        accountName: accountNameController.text,
+                        phoneNumber: _.userData.phoneNumber.replaceAll('+', ''),
+                        context: context,
+                      ).then((value) {
                         Get.back();
                       }).onError((error, stackTrace) {
                         Get.back();
@@ -179,7 +189,7 @@ class _OpenAccountScreenState extends State<OpenAccountScreen> {
                     } on FirebaseException catch (e) {
                       Get.back();
 
-                      print(e.toString());
+                      print('Error caught: ${e.toString()}');
                     }
                   },
                   child: Container(

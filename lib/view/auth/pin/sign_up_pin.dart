@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expose_banq/const/app_text_styles.dart';
 import 'package:expose_banq/const/sizes.dart';
@@ -133,6 +137,7 @@ class _SignUpPinScreenState extends State<SignUpPinScreen> {
                             .signInWithCredential(credential)
                             .then((value) async {
                           //stores data to firestore database entered by user
+
                           FirebaseFirestore.instance
                               .collection('userData')
                               .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -166,15 +171,14 @@ class _SignUpPinScreenState extends State<SignUpPinScreen> {
                             'isSuspended': false,
                             'isBanned': false,
                           }).then((value) {
+                            // showLoading(context);
                             AccountController.createNewAccounts(
-                                    accountName: widget.email
-                                            .contains('@gmail.com')
-                                        ? widget.email
-                                            .replaceAll('@gmail.com', '')
-                                        : widget.email.replaceAll('.com', ''),
-                                    phoneNumber: widget.phoneNumber,
-                                    context: context)
-                                .then((value) => Get.off(const Wrapper()));
+                              accountName: widget.email.contains('@gmail.com')
+                                  ? widget.email.replaceAll('@gmail.com', '')
+                                  : widget.email.replaceAll('.com', ''),
+                              phoneNumber: widget.phoneNumber,
+                              context: context,
+                            ).then((value) => Get.off(const Wrapper()));
                           });
                         });
                       }),

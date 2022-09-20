@@ -21,7 +21,8 @@ class UserData {
       regionOrProvince,
       town,
       profile,
-      id;
+      id,
+      notificationToken;
   UserData({
     required this.phoneNumber,
     required this.firstName,
@@ -44,6 +45,7 @@ class UserData {
     required this.town,
     required this.profile,
     required this.id,
+    required this.notificationToken,
   });
   @override
   List<Object?> get props => [
@@ -68,6 +70,7 @@ class UserData {
         town,
         profile,
         id,
+        notificationToken,
       ];
   static UserData fromJson(DocumentSnapshot snapshot) {
     UserData userData = UserData(
@@ -92,6 +95,7 @@ class UserData {
       regionOrProvince: snapshot['regionOrProvince'],
       town: snapshot['townController'],
       profile: snapshot['profileImage'],
+      notificationToken: snapshot['notificationToken'],
     );
     return userData;
   }

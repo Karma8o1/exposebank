@@ -9,13 +9,14 @@ class CardDataField extends StatelessWidget {
   final TextInputType? keyboardType;
   final bool? obscureText;
 
-  const CardDataField({Key? key,
+  CardDataField({
+    Key? key,
     required this.titleText,
     required this.keyboardType,
     required this.hintText,
     required this.controller,
     this.obscureText = false,
-}) : super(key: key);
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +57,10 @@ class CardDataField extends StatelessWidget {
               ),
               decoration: InputDecoration(
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.only(bottom: 4.0, left: 16.0,),
+                contentPadding: const EdgeInsets.only(
+                  bottom: 4.0,
+                  left: 16.0,
+                ),
                 hintText: hintText,
                 hintStyle: poppinsRegular.copyWith(
                   fontSize: 13.0,

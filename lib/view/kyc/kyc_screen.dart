@@ -1,6 +1,8 @@
 // ignore_for_file: must_be_immutable, unnecessary_null_comparison
 
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,6 +15,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:file_picker/file_picker.dart';
@@ -638,35 +641,45 @@ class _KYCScreenState extends State<KYCScreen> {
                   onTap: () {
                     //registers user to firebase and stores the collected data.
                     if (_formKey.currentState!.validate()) {
-                      showLoading(context);
-                      
-                      AuthController.registerUser(
-                        phoneNumber: widget.phoneNumber,
-                        firstName: firstNameController.text.trim(),
-                        email: widget.email,
-                        username: widget.userName,
-                        pinCode: widget.pin,
-                        lastName: lastNameController.text,
-                        dateOfBirth: dateOfBirthController.text,
-                        placeOfBirth: placeOfBirthController.text,
-                        sex: sexController.text,
-                        nationality: nationalityController.text,
-                        martialStatus: martialStatusController.text,
-                        motherLastName: motherLastNameController.text,
-                        nationCardNumber: nationCardNumberController.text,
-                        nicOrPassportIssueDate:
-                            nicOrPassportExpiryDateController.text,
-                        nicOrPassportExpiryDate:
-                            nicOrPassportExpiryDateController.text,
-                        profession: professionController.text,
-                        countryOfResidence: countryOfResidenceController.text,
-                        regionOrProvince: regionOrProvinceController.text,
-                        town: townController.text,
-                        context: context,
-                        cnicBack: cnicBack,
-                        cnicFront: cnicFront,
-                        profile: profileImage,
-                      );
+                      if (profileImage != null &&
+                          cnicBack != null &&
+                          cnicFront != null) {
+                        showLoading(context);
+// showLoading(context);
+                        AuthController.registerUser(
+                          phoneNumber: widget.phoneNumber,
+                          firstName: firstNameController.text.trim(),
+                          email: widget.email,
+                          username: widget.userName,
+                          pinCode: widget.pin,
+                          lastName: lastNameController.text,
+                          dateOfBirth: dateOfBirthController.text,
+                          placeOfBirth: placeOfBirthController.text,
+                          sex: sexController.text,
+                          nationality: nationalityController.text,
+                          martialStatus: martialStatusController.text,
+                          motherLastName: motherLastNameController.text,
+                          nationCardNumber: nationCardNumberController.text,
+                          nicOrPassportIssueDate:
+                              nicOrPassportExpiryDateController.text,
+                          nicOrPassportExpiryDate:
+                              nicOrPassportExpiryDateController.text,
+                          profession: professionController.text,
+                          countryOfResidence: countryOfResidenceController.text,
+                          regionOrProvince: regionOrProvinceController.text,
+                          town: townController.text,
+                          cnicBack: cnicBack,
+                          cnicFront: cnicFront,
+                          profile: profileImage,
+                          context: context,
+                        );
+                      } else {
+                        ElegantNotification.error(
+                                title: Text('Documents missing'),
+                                description: Text(
+                                    'It is mandatory to upload profile and id images.'))
+                            .show(context);
+                      }
                     }
                   },
                   btnColorOne: AppColors.violetColor,

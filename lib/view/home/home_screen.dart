@@ -1,13 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:expose_banq/const/loading.dart';
 import 'package:expose_banq/models/privateAccountModel/private_account_model.dart';
 import 'package:expose_banq/view/approval_request_page/approval_request_screen.dart';
 import 'package:expose_banq/view/home/components/open_account_button.dart';
 import 'package:expose_banq/view/home/open_account_screen.dart';
 import 'package:expose_banq/widgets/fade_animation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 
@@ -45,6 +48,23 @@ class _HomeScreenState extends State<HomeScreen> {
     AppColors.redDarkColor,
     AppColors.redDarkColor,
   ];
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      // showLoading(context);
+
+      FirebaseMessaging.instance.getToken().then((value) {
+        FirebaseFirestore.instance
+            .collection('userData')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .update({
+          'notificationToken': value,
+        });
+      }).then((value) {
+        Get.back();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,8 +197,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (snapshot.hasData &&
                               snapshot.data!.docs.isNotEmpty) {
                             return IconButton(
-                              onPressed: () {
-                                Get.to(const ApprovalRequestScreen());
+                              onPressed: () async {
+                                showLoading(context);
+                                await FirebaseMessaging.instance
+                                    .getToken()
+                                    .then((value) {
+                                  FirebaseFunctions.instance
+                                      .httpsCallable('sendNotification')
+                                      .call({'token': value}).then((value) {
+                                    Get.back();
+                                    print(
+                                        'value from cloud functions: ${value.data}');
+                                  });
+                                });
+
+                                // Get.to(const ApprovalRequestScreen());
                               },
                               icon: Stack(
                                 children: [
@@ -214,8 +247,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                           if (snapshot.data!.docs.isEmpty) {
                             return IconButton(
-                              onPressed: () {
-                                Get.to(const ApprovalRequestScreen());
+                              onPressed: () async {
+                                showLoading(context);
+                                await FirebaseMessaging.instance
+                                    .getToken()
+                                    .then((value) {
+                                  FirebaseFunctions.instance
+                                      .httpsCallable('sendNotification')
+                                      .call({'token': value}).then((value) {
+                                    Get.back();
+                                    print(
+                                        'value from cloud functions: ${value.data}');
+                                  });
+                                });
+
+                                // Get.to(const ApprovalRequestScreen());
                               },
                               icon: Stack(
                                 children: [
@@ -250,8 +296,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           } else {
                             return IconButton(
-                              onPressed: () {
-                                Get.to(const ApprovalRequestScreen());
+                              onPressed: () async {
+                                showLoading(context);
+                                await FirebaseMessaging.instance
+                                    .getToken()
+                                    .then((value) {
+                                  FirebaseFunctions.instance
+                                      .httpsCallable('sendNotification')
+                                      .call({'token': value}).then((value) {
+                                    Get.back();
+                                    print(
+                                        'value from cloud functions: ${value.data}');
+                                  });
+                                });
+                                // Get.to(const ApprovalRequestScreen());
                               },
                               icon: Stack(
                                 children: [

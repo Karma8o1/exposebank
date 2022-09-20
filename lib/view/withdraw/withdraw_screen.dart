@@ -1,9 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../const/exports.dart';
 import '../../widgets/confirm_bottom_sheet.dart';
 import 'components/withdraw_box_widget.dart';
+
+late List value;
 
 class WithdrawScreen extends StatefulWidget {
   const WithdrawScreen({Key? key}) : super(key: key);
@@ -16,6 +21,10 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   bool isPersonal = true;
   bool isGroup = false;
   bool isSaving = false;
+  String? selectedValue;
+  var choosenUser;
+  String toAccount = 'indiAccount';
+  TextEditingController amountController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -54,16 +63,405 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                   color: AppColors.whiteColor,
                 ),
               ),
+              const SizedBox(height: 24.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: SizedBox(
+                  height: 60,
+                  width: width(context),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton2(
+                      isExpanded: true,
+                      hint: Row(
+                        children: [
+                          Icon(
+                            Icons.list,
+                            size: 16,
+                            color: Colors.black,
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Expanded(
+                            child: Text(
+                              "Select Sender's Account Type",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      items: ['indiAccount', 'jointAccount']
+                          .map((item) => DropdownMenuItem<String>(
+                                value: item,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      item == 'indiAccount'
+                                          ? 'Private Account'
+                                          : 'Joint Account',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ))
+                          .toList(),
+                      value: toAccount,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedValue = null;
+                          toAccount = value as String;
+                          print(value);
+                        });
+                      },
+                      icon: const Icon(
+                        Icons.arrow_forward_ios_outlined,
+                      ),
+                      iconSize: 14,
+                      iconEnabledColor: Colors.black,
+                      iconDisabledColor: Colors.grey,
+                      buttonHeight: 50,
+                      buttonWidth: 160,
+                      buttonPadding: const EdgeInsets.only(left: 14, right: 14),
+                      buttonDecoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.black26,
+                        ),
+                        color: Colors.white,
+                      ),
+                      buttonElevation: 2,
+                      itemHeight: 40,
+                      itemPadding: const EdgeInsets.only(left: 14, right: 14),
+                      dropdownMaxHeight: 200,
+                      dropdownWidth: 200,
+                      dropdownPadding: null,
+                      dropdownDecoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: Colors.white,
+                      ),
+                      dropdownElevation: 8,
+                      scrollbarRadius: const Radius.circular(40),
+                      scrollbarThickness: 6,
+                      scrollbarAlwaysShow: true,
+                      offset: const Offset(-20, 0),
+                    ),
+                  ),
+                ),
+              ),
+
+              /// from the cards
+              const SizedBox(height: 16.0),
+              toAccount == 'indiAccount'
+                  ? StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('indiAccount')
+                          .where(
+                            'userRef',
+                            isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                          )
+                          .snapshots(),
+                      builder:
+                          ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.data!.docs.isNotEmpty) {
+                          value = snapshot.data!.docs;
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: SizedBox(
+                              height: 60,
+                              width: width(context),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton2(
+                                  isExpanded: true,
+                                  hint: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.list,
+                                        size: 16,
+                                        color: Colors.yellow,
+                                      ),
+                                      SizedBox(
+                                        width: 4,
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          'Select Account',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  items: value
+                                      .map((item) => DropdownMenuItem<String>(
+                                            value: item.id,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  item['accountName'],
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                Text(
+                                                  item['balance'].toString(),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ],
+                                            ),
+                                          ))
+                                      .toList(),
+                                  value: selectedValue,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedValue = value as String;
+                                      print(value);
+                                    });
+                                  },
+                                  icon: const Icon(
+                                    Icons.arrow_forward_ios_outlined,
+                                  ),
+                                  iconSize: 14,
+                                  iconEnabledColor: Colors.black,
+                                  iconDisabledColor: Colors.grey,
+                                  buttonHeight: 50,
+                                  buttonWidth: 160,
+                                  buttonPadding: const EdgeInsets.only(
+                                      left: 14, right: 14),
+                                  buttonDecoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: Colors.black26,
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                  buttonElevation: 2,
+                                  itemHeight: 40,
+                                  itemPadding: const EdgeInsets.only(
+                                      left: 14, right: 14),
+                                  dropdownMaxHeight: 200,
+                                  dropdownWidth: 200,
+                                  dropdownPadding: null,
+                                  dropdownDecoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                    color: Colors.white,
+                                  ),
+                                  dropdownElevation: 8,
+                                  scrollbarRadius: const Radius.circular(40),
+                                  scrollbarThickness: 6,
+                                  scrollbarAlwaysShow: true,
+                                  offset: const Offset(-20, 0),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        if (snapshot.data!.docs.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              'No Accounts have been created yet',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          );
+                        }
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text(snapshot.error.toString()),
+                          );
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 1,
+                            ),
+                          );
+                        }
+                      }),
+                    )
+                  : StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('jointAccount')
+                          .where(
+                        'partners',
+                        arrayContainsAny: [
+                          FirebaseAuth.instance.currentUser!.uid
+                        ],
+                      ).snapshots(),
+                      builder:
+                          ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.data!.docs.isNotEmpty) {
+                          value = snapshot.data!.docs;
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: SizedBox(
+                              height: 60,
+                              width: width(context),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton2(
+                                  isExpanded: true,
+                                  hint: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.list,
+                                        size: 16,
+                                        color: Colors.yellow,
+                                      ),
+                                      SizedBox(
+                                        width: 4,
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          'Select Account',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  items: value
+                                      .map((item) => DropdownMenuItem<String>(
+                                            value: item.id,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  item['accountName'],
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                Text(
+                                                  item['balance'].toString(),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ],
+                                            ),
+                                          ))
+                                      .toList(),
+                                  value: selectedValue,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedValue = value as String;
+                                      print(value);
+                                    });
+                                  },
+                                  icon: const Icon(
+                                    Icons.arrow_forward_ios_outlined,
+                                  ),
+                                  iconSize: 14,
+                                  iconEnabledColor: Colors.black,
+                                  iconDisabledColor: Colors.grey,
+                                  buttonHeight: 50,
+                                  buttonWidth: 160,
+                                  buttonPadding: const EdgeInsets.only(
+                                      left: 14, right: 14),
+                                  buttonDecoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: Colors.black26,
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                  buttonElevation: 2,
+                                  itemHeight: 40,
+                                  itemPadding: const EdgeInsets.only(
+                                      left: 14, right: 14),
+                                  dropdownMaxHeight: 200,
+                                  dropdownWidth: 200,
+                                  dropdownPadding: null,
+                                  dropdownDecoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                    color: Colors.white,
+                                  ),
+                                  dropdownElevation: 8,
+                                  scrollbarRadius: const Radius.circular(40),
+                                  scrollbarThickness: 6,
+                                  scrollbarAlwaysShow: true,
+                                  offset: const Offset(-20, 0),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              'No Accounts have been created yet',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          );
+                        }
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text(snapshot.error.toString()),
+                          );
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 1,
+                            ),
+                          );
+                        }
+                      }),
+                    ),
 
               /// payment texts
               SizedBox(height: height(context) * 0.07),
-              /*Text(
-                'XAF 1,360',
-                style: poppinsSemiBold.copyWith(
-                  fontSize: 42.0,
-                  color: AppColors.whiteColor,
-                ),
-              ),*/
 
               Container(
                 height: 50.0,
@@ -77,6 +475,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                   ),
                 ),
                 child: TextFormField(
+                  controller: amountController,
                   keyboardType: TextInputType.number,
                   style: poppinsMedium.copyWith(
                     fontSize: 17.0,
@@ -100,7 +499,9 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
               ),
 
               /// space
-             SizedBox(height: height(context) * 0.27,),
+              SizedBox(
+                height: height(context) * 0.27,
+              ),
 
               /// bank accounts
               Padding(
@@ -111,20 +512,10 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        'Withdraw From Bank Account',
+                        'Transfer to account',
                         style: poppinsRegular.copyWith(
                           fontSize: 16.0,
                           color: AppColors.whiteColor,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Add',
-                        style: poppinsRegular.copyWith(
-                          fontSize: 13.0,
-                          color: Colors.blue,
                         ),
                       ),
                     ),
@@ -142,8 +533,11 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                   });
 
                   Get.bottomSheet(
-                    const ConfirmBottomSheet(
+                    ConfirmBottomSheet(
                       isWithdraw: true,
+                      amount: int.parse(amountController.text),
+                      jointAccountModel: null,
+                      privateAccount: null,
                     ),
                     backgroundColor: AppColors.whiteColor,
                     shape: const RoundedRectangleBorder(
@@ -152,7 +546,6 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                         topLeft: Radius.circular(28.0),
                       ),
                     ),
-
                     enableDrag: true,
                     enterBottomSheetDuration: const Duration(milliseconds: 400),
                     exitBottomSheetDuration: const Duration(milliseconds: 400),
@@ -202,8 +595,11 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                   });
 
                   Get.bottomSheet(
-                    const ConfirmBottomSheet(
+                    ConfirmBottomSheet(
                       isWithdraw: true,
+                      amount: int.parse(amountController.text),
+                      jointAccountModel: null,
+                      privateAccount: null,
                     ),
                     backgroundColor: AppColors.whiteColor,
                     shape: const RoundedRectangleBorder(
@@ -212,7 +608,6 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                         topLeft: Radius.circular(28.0),
                       ),
                     ),
-
                     enableDrag: true,
                     enterBottomSheetDuration: const Duration(milliseconds: 400),
                     exitBottomSheetDuration: const Duration(milliseconds: 400),
@@ -223,67 +618,6 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                 bankNumberText: '**** *** 3720',
                 bankTypeText: 'Group Account',
                 checkBox: isGroup == true
-                    ? Container(
-                        height: 22.0,
-                        width: 22.0,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.checkedColor,
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.check,
-                            size: 14.0,
-                            color: AppColors.whiteColor,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        height: 22.0,
-                        width: 22.0,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.whiteColor,
-                          border: Border.all(
-                            width: 2.0,
-                            color: AppColors.borderColor,
-                          ),
-                        ),
-                      ),
-              ),
-
-              /// saving bank account
-              WithdrawBoxWidget(
-                onTap: () {
-                  setState(() {
-                    isPersonal = false;
-                    isGroup = false;
-                    isSaving = true;
-                  });
-
-                  Get.bottomSheet(
-                    const ConfirmBottomSheet(
-                      isWithdraw: true,
-                    ),
-                    backgroundColor: AppColors.whiteColor,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(28.0),
-                        topLeft: Radius.circular(28.0),
-                      ),
-                    ),
-
-                    enableDrag: true,
-                    enterBottomSheetDuration: const Duration(milliseconds: 400),
-                    exitBottomSheetDuration: const Duration(milliseconds: 400),
-                  );
-                },
-                isPng: true,
-                bankBoxColor: AppColors.savingColor,
-                bankImagePath: AppImages.savingAccountImage,
-                bankNumberText: '**** *** 3980',
-                bankTypeText: 'Saving Account',
-                checkBox: isSaving == true
                     ? Container(
                         height: 22.0,
                         width: 22.0,

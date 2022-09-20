@@ -261,30 +261,4 @@ class _SecurityScreenState extends State<SecurityScreen> {
       ),
     );
   }
-
-  // static Future<void> callNotificatioFunction({
-  //   required String title,
-  //   required String description,
-  //   required String recieverId,
-  // }) async {
-  //   try {
-  //     FirebaseFirestore.instance
-  //         .collection('userData')
-  //         .doc(FirebaseAuth.instance.currentUser!.uid)
-  //         .get()
-  //         .then((value) async {
-  //       final HttpsCallable callable =
-  //           FirebaseFunctions.instance.httpsCallable('fundsTransfer');
-  //       final resp = await callable.call(<String, dynamic>{
-  //         'title': title,
-  //         'desc': description,
-  //         'recieverId': recieverId,
-  //         'senderId': value['notificationToken'],
-  //       });
-  //       print('data from the response : ${resp.data}');
-  //     });
-  //   } on FirebaseException catch (e) {
-  //     print('Here is the error with functions: $e');
-  //   }
-  // }
 }

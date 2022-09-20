@@ -118,7 +118,7 @@ Future<void> main() async {
     locale = const Locale('fr', 'FR');
   }
   showOnboardingScreen = prefs.getBool('showOnboardingScreen') ?? true;
-  
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
   canAuthenticate =

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:expose_banq/const/loading.dart';
 import 'package:expose_banq/controllers/userDataController/userDataController.dart';
@@ -6,12 +7,15 @@ import 'package:expose_banq/models/userData/userDataModel.dart';
 import 'package:expose_banq/view/drawer/drawer_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../const/exports.dart';
 
 bool isNameTaken = false;
+late final fcm;
 
 class OpenJointAccountScreen extends StatefulWidget {
   const OpenJointAccountScreen({Key? key}) : super(key: key);
@@ -21,6 +25,16 @@ class OpenJointAccountScreen extends StatefulWidget {
 }
 
 class _OpenJointAccountScreenState extends State<OpenJointAccountScreen> {
+  // FirebaseMessaging
+  //     .instance
+  //     .getToken();
+  @override
+  void initState() {
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      fcm = await FirebaseMessaging.instance.getToken();
+    });
+  }
+
   TextEditingController accountNameController = TextEditingController();
   TextEditingController eventController = TextEditingController();
   String selectedValue = "Account Type...";
@@ -117,6 +131,34 @@ class _OpenJointAccountScreenState extends State<OpenJointAccountScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: TextFormField(
                         controller: accountNameController,
+                        onEditingComplete: (() {
+                          FirebaseFirestore.instance
+                              .collection('jointAccount')
+                              .doc(accountNameController.text)
+                              .get()
+                              .then((value) {
+                            if (value.exists) {
+                              ElegantNotification.error(
+                                      title: Text('Account Name Taken'),
+                                      description: Text(
+                                          'Account with name already exists.'))
+                                  .show(context);
+                            }
+                          });
+                          FirebaseFirestore.instance
+                              .collection('privateAccount')
+                              .doc(accountNameController.text)
+                              .get()
+                              .then((value) {
+                            if (value.exists) {
+                              ElegantNotification.error(
+                                      title: Text('Account Name Taken'),
+                                      description: Text(
+                                          'Account with name already exists.'))
+                                  .show(context);
+                            }
+                          });
+                        }),
                         onFieldSubmitted: ((value) {
                           FirebaseFirestore.instance
                               .collection('jointAccount')
@@ -352,6 +394,7 @@ class _OpenJointAccountScreenState extends State<OpenJointAccountScreen> {
                         stream: FirebaseFirestore.instance
                             .collection('userData')
                             .where('userName', isEqualTo: eventController.text)
+                            .limit(1)
                             .snapshots(),
                         builder:
                             (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -386,6 +429,14 @@ class _OpenJointAccountScreenState extends State<OpenJointAccountScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: [
+                                        Checkbox(
+                                          value: choosenUser != null &&
+                                                  choosenUser!.firstName ==
+                                                      userData.firstName
+                                              ? true
+                                              : false,
+                                          onChanged: null,
+                                        ),
                                         CircleAvatar(
                                           radius: 20.0,
                                           backgroundColor:
@@ -467,192 +518,325 @@ class _OpenJointAccountScreenState extends State<OpenJointAccountScreen> {
 
                       return InkWell(
                         onTap: () {
-                          if (_formKey.currentState!.validate() &&
-                              isNameTaken == false) {
-                            showDialog(
-                                context: context,
-                                builder: (_) {
-                                  return AlertDialog(
-                                    content: SizedBox(
-                                      width: MediaQuery.of(context).size.width,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'Requested User: ${choosenUser!.username}',
-                                            style: poppinsLight.copyWith(
-                                              fontSize: 14.0,
-                                              color: AppColors.greyColor,
-                                            ),
-                                          ),
-                                          Text(
-                                            'Requesting Date: ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',
-                                            style: poppinsLight.copyWith(
-                                              fontSize: 14.0,
-                                              color: AppColors.greyColor,
-                                            ),
-                                          ),
-                                          Text(
-                                            'Account Type: ${selectedValue}',
-                                            style: poppinsLight.copyWith(
-                                              fontSize: 14.0,
-                                              color: AppColors.greyColor,
-                                            ),
-                                          ),
-                                          Text(
-                                            'Account Privelage: ${memberValue}',
-                                            style: poppinsLight.copyWith(
-                                              fontSize: 14.0,
-                                              color: AppColors.greyColor,
-                                            ),
-                                          ),
-                                          Text(
-                                            'Request Status: Awaited',
-                                            style: poppinsLight.copyWith(
-                                              fontSize: 14.0,
-                                              color: AppColors.greyColor,
-                                            ),
-                                          ),
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                                left: 16.0,
-                                                right: 16.0,
-                                                top: 10.0),
-                                            width: width(context),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 16.0,
-                                                vertical: 10.0),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              color: AppColors.blackGreyColor,
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                CircleAvatar(
-                                                  radius: 20.0,
-                                                  backgroundColor:
-                                                      AppColors.violetDarkColor,
-                                                  child: CircleAvatar(
-                                                    radius: 18.0,
-                                                    backgroundImage:
-                                                        NetworkImage(
-                                                            choosenUser!
-                                                                .profile),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10.0),
-                                                Expanded(
-                                                  child: Column(
+                          if (_formKey.currentState!.validate()) {
+                            FirebaseFirestore.instance
+                                .collection('jointAccount')
+                                .doc(accountNameController.text)
+                                .get()
+                                .then(((value) {
+                              if (value.exists) {
+                                ElegantNotification.error(
+                                    description: Text(
+                                        'Account name already taken. Please select another account name.'));
+                              } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        content: SizedBox(
+                                          width: width(context),
+                                          height: 300,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
                                                             .start,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
                                                     children: [
                                                       Text(
-                                                        choosenUser!.username,
-                                                        style: poppinsMedium
-                                                            .copyWith(
-                                                          fontSize: 16.0,
-                                                          color: AppColors
-                                                              .whiteColor,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(
-                                                          height: 5.0),
-                                                      Text(
-                                                        choosenUser!.email,
-                                                        style: poppinsMedium
+                                                        'Requested User:',
+                                                        style: poppinsLight
                                                             .copyWith(
                                                           fontSize: 14.0,
                                                           color: AppColors
-                                                              .redDarkColor,
+                                                              .greyColor,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        'Requesting Date:',
+                                                        style: poppinsLight
+                                                            .copyWith(
+                                                          fontSize: 14.0,
+                                                          color: AppColors
+                                                              .greyColor,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        'Account Type:',
+                                                        style: poppinsLight
+                                                            .copyWith(
+                                                          fontSize: 14.0,
+                                                          color: AppColors
+                                                              .greyColor,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        'Request Status:',
+                                                        style: poppinsLight
+                                                            .copyWith(
+                                                          fontSize: 14.0,
+                                                          color: AppColors
+                                                              .greyColor,
                                                         ),
                                                       ),
                                                     ],
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          Center(
-                                            child: InkWell(
-                                              onTap: () async {
-                                                showLoading(context);
-                                                FirebaseFirestore.instance
-                                                    .collection('requests')
-                                                    .doc(accountNameController
-                                                        .text)
-                                                    .set({
-                                                  'requestFrom':
-                                                      currentUsername,
-                                                  'requestDate':
-                                                      Timestamp.fromDate(
-                                                          DateTime.now()),
-                                                  'senderRef': FirebaseAuth
-                                                      .instance
-                                                      .currentUser!
-                                                      .uid,
-                                                  'accountName':
-                                                      accountNameController
-                                                          .text,
-                                                  'permissionsGranted':
-                                                      memberValue,
-                                                  'accountType': selectedValue,
-                                                  'isPermissionGranted':
-                                                      'Awaited',
-                                                  'recieverRef':
-                                                      choosenUser!.id,
-                                                }).then((value) {
-                                                  Get.back();
-                                                }).onError((error, stackTrace) {
-                                                  Get.back();
-                                                });
-                                              },
-                                              borderRadius:
-                                                  BorderRadius.circular(50.0),
-                                              child: Ink(
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        choosenUser!.username,
+                                                        style: poppinsLight
+                                                            .copyWith(
+                                                          fontSize: 14.0,
+                                                          color: AppColors
+                                                              .greyColor,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        DateFormat('dd/MM/yyyy')
+                                                            .format(
+                                                                DateTime.now()),
+                                                        style: poppinsLight
+                                                            .copyWith(
+                                                          fontSize: 14.0,
+                                                          color: AppColors
+                                                              .greyColor,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        selectedValue,
+                                                        style: poppinsLight
+                                                            .copyWith(
+                                                          fontSize: 14.0,
+                                                          color: AppColors
+                                                              .greyColor,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        'Awaited',
+                                                        style: poppinsLight
+                                                            .copyWith(
+                                                          fontSize: 14.0,
+                                                          color: AppColors
+                                                              .greyColor,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                              Container(
+                                                margin: const EdgeInsets.only(
+                                                    left: 16.0,
+                                                    right: 16.0,
+                                                    top: 10.0),
+                                                width: 250,
                                                 padding:
                                                     const EdgeInsets.symmetric(
-                                                        horizontal: 48.0,
-                                                        vertical: 14.0),
+                                                        horizontal: 16.0,
+                                                        vertical: 10.0),
                                                 decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.circular(
-                                                          50.0),
-                                                  gradient:
-                                                      const LinearGradient(
-                                                    colors: [
-                                                      AppColors.btnOneColor,
-                                                      AppColors.blackColor,
-                                                    ],
-                                                    begin: Alignment.topCenter,
-                                                    end: Alignment.bottomCenter,
-                                                  ),
+                                                          8.0),
+                                                  color:
+                                                      AppColors.blackGreyColor,
                                                 ),
-                                                child: Text(
-                                                  'Send Request!',
-                                                  style:
-                                                      poppinsSemiBold.copyWith(
-                                                    fontSize: 14.0,
-                                                    color: AppColors.whiteColor,
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    CircleAvatar(
+                                                      radius: 20.0,
+                                                      backgroundColor: AppColors
+                                                          .violetDarkColor,
+                                                      child: CircleAvatar(
+                                                        radius: 18.0,
+                                                        backgroundImage:
+                                                            NetworkImage(
+                                                                choosenUser!
+                                                                    .profile),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Text(
+                                                            choosenUser!
+                                                                .username,
+                                                            style: poppinsMedium
+                                                                .copyWith(
+                                                              fontSize: 16.0,
+                                                              color: AppColors
+                                                                  .whiteColor,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 5.0),
+                                                          Text(
+                                                            choosenUser!.email,
+                                                            style: poppinsMedium
+                                                                .copyWith(
+                                                              fontSize: 14.0,
+                                                              color: AppColors
+                                                                  .redDarkColor,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Divider(
+                                                height: 10,
+                                              ),
+                                              Center(
+                                                child: InkWell(
+                                                  onTap: () async {
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            'jointAccount')
+                                                        .doc(
+                                                            accountNameController
+                                                                .text)
+                                                        .get()
+                                                        .then((value) {
+                                                      if (value.exists) {
+                                                        ElegantNotification.error(
+                                                                title: Text(
+                                                                    'Account Name Taken'),
+                                                                description: Text(
+                                                                    'Account with name already exists.'))
+                                                            .show(context);
+                                                      } else {
+                                                        showLoading(context);
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'requests')
+                                                            .doc(
+                                                                accountNameController
+                                                                    .text)
+                                                            .set({
+                                                          'requestFrom':
+                                                              currentUsername,
+                                                          'requestDate':
+                                                              Timestamp.fromDate(
+                                                                  DateTime
+                                                                      .now()),
+                                                          'senderRef':
+                                                              FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser!
+                                                                  .uid,
+                                                          'accountName':
+                                                              accountNameController
+                                                                  .text,
+                                                          'permissionsGranted':
+                                                              memberValue,
+                                                          'accountType':
+                                                              selectedValue,
+                                                          'isPermissionGranted':
+                                                              'Awaited',
+                                                          'recieverRef':
+                                                              choosenUser!.id,
+                                                        }).then((value) {
+                                                          FirebaseFunctions
+                                                              .instance
+                                                              .httpsCallable(
+                                                                  'sendJointAccountRequest')
+                                                              .call({
+                                                            'tokens': [
+                                                              fcm,
+                                                              choosenUser!
+                                                                  .notificationToken
+                                                            ],
+                                                            'title':
+                                                                'You have recieved a joint account request.',
+                                                            'body':
+                                                                '${_.userData.firstName} wants to open a joint account and has provided you with ${memberValue}',
+                                                          }).then((value) {
+                                                            print('success');
+                                                            Get.back();
+                                                          }).onError((error,
+                                                                  stackTrace) {
+                                                            Get.back();
+                                                            print(error);
+                                                          });
+                                                          Get.back();
+                                                        }).onError((error,
+                                                                stackTrace) {
+                                                          Get.back();
+                                                        });
+                                                      }
+                                                    });
+                                                  },
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          50.0),
+                                                  child: Ink(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 48.0,
+                                                        vertical: 14.0),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              50.0),
+                                                      gradient:
+                                                          const LinearGradient(
+                                                        colors: [
+                                                          AppColors.btnOneColor,
+                                                          AppColors.blackColor,
+                                                        ],
+                                                        begin:
+                                                            Alignment.topCenter,
+                                                        end: Alignment
+                                                            .bottomCenter,
+                                                      ),
+                                                    ),
+                                                    child: Text(
+                                                      'Send Request!',
+                                                      style: poppinsSemiBold
+                                                          .copyWith(
+                                                        fontSize: 14.0,
+                                                        color: AppColors
+                                                            .whiteColor,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                });
+                                        ),
+                                      );
+                                    });
+                              }
+                            }));
                           }
                         },
                         child: Row(
