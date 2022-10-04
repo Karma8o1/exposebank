@@ -36,7 +36,7 @@ class _OpenJointAccountScreenState extends State<OpenJointAccountScreen> {
   }
 
   TextEditingController accountNameController = TextEditingController();
-  TextEditingController eventController = TextEditingController();
+  TextEditingController partnerController = TextEditingController();
   String selectedValue = "Account Type...";
   String memberValue = "Please Select...";
   UserData? choosenUser;
@@ -350,7 +350,7 @@ class _OpenJointAccountScreenState extends State<OpenJointAccountScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: TextFormField(
-                        controller: eventController,
+                        controller: partnerController,
                         keyboardType: TextInputType.name,
                         style: poppinsRegular.copyWith(
                           fontSize: 15.0,
@@ -393,7 +393,8 @@ class _OpenJointAccountScreenState extends State<OpenJointAccountScreen> {
                     StreamBuilder(
                         stream: FirebaseFirestore.instance
                             .collection('userData')
-                            .where('userName', isEqualTo: eventController.text)
+                            .where('userName',
+                                isEqualTo: partnerController.text.trim())
                             .limit(1)
                             .snapshots(),
                         builder:
@@ -769,15 +770,18 @@ class _OpenJointAccountScreenState extends State<OpenJointAccountScreen> {
                                                               .httpsCallable(
                                                                   'sendJointAccountRequest')
                                                               .call({
-                                                            'tokens': [
-                                                              fcm,
-                                                              choosenUser!
-                                                                  .notificationToken
-                                                            ],
-                                                            'title':
+                                                            'senderToken': fcm,
+                                                            'recieverToken':
+                                                                choosenUser!
+                                                                    .notificationToken,
+                                                            'recieverTitle':
                                                                 'You have recieved a joint account request.',
-                                                            'body':
+                                                            'recieverBody':
                                                                 '${_.userData.firstName} wants to open a joint account and has provided you with ${memberValue}',
+                                                            'senderTitle':
+                                                                'Request sent to ${choosenUser!.firstName}',
+                                                            'senderBody':
+                                                                'Your request to open joint account has been sent to user',
                                                           }).then((value) {
                                                             print('success');
                                                             Get.back();

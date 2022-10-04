@@ -172,20 +172,22 @@ class _OpenAccountScreenState extends State<OpenAccountScreen> {
 
                 return InkWell(
                   onTap: () {
-                    
                     try {
-                      //   // showLoading(context);
-
-                      AccountController.createNewAccounts(
-                        accountName: accountNameController.text,
-                        phoneNumber: _.userData.phoneNumber.replaceAll('+', ''),
-                        context: context,
-                      ).then((value) {
+                      showLoading(context);
+                      AccountController.createPrivateAccount(
+                              firstName: _.userData.firstName,
+                              lastName: _.userData.lastName,
+                              email: _.userData.email,
+                              phoneNumber: _.userData.phoneNumber,
+                              billingName: accountNameController.text,
+                              context: context)
+                          .then((value) {
                         Get.back();
                       }).onError((error, stackTrace) {
                         Get.back();
                         print(error);
                       });
+                      ;
                     } on FirebaseException catch (e) {
                       Get.back();
 

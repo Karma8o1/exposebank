@@ -5,7 +5,9 @@ import '../../../const/exports.dart';
 class VerifyBox extends StatelessWidget {
   final bool? isVerify;
   final String? userImagePath;
-  final String? userNameText;
+  final String? accountNumber;
+  final String? bankName;
+  final String? accountName;
   final String? paymentValueText;
   final VoidCallback? onTap;
 
@@ -13,8 +15,10 @@ class VerifyBox extends StatelessWidget {
     Key? key,
     required this.onTap,
     required this.isVerify,
+    required this.bankName,
+    required this.accountName,
     this.userImagePath = AppImages.userImage,
-    required this.userNameText,
+    required this.accountNumber,
     required this.paymentValueText,
   }) : super(key: key);
 
@@ -44,7 +48,14 @@ class VerifyBox extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    userNameText!,
+                    accountNumber!,
+                    style: poppinsMedium.copyWith(
+                      fontSize: 16.0,
+                      color: AppColors.blackColor,
+                    ),
+                  ),
+                  Text(
+                    accountName!,
                     style: poppinsMedium.copyWith(
                       fontSize: 16.0,
                       color: AppColors.blackColor,

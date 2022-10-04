@@ -3,6 +3,8 @@ import 'package:expose_banq/const/exports.dart';
 import 'package:expose_banq/controllers/userDataController/userDataController.dart';
 import 'package:expose_banq/main.dart';
 import 'package:expose_banq/models/userData/userDataModel.dart';
+import 'package:expose_banq/view/bill_payment/bill_payment_screen.dart';
+import 'package:expose_banq/view/wrapper/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -60,27 +62,26 @@ class _MenuScreenState extends State<MenuScreen> {
 
                 /// user name
                 const SizedBox(height: 16.0),
-                              /// Open Bank Account Immediately button
 
+                /// Open Bank Account Immediately button
                 FutureBuilder(
                     future: FirebaseFirestore.instance
                         .collection('userData')
                         .doc(FirebaseAuth.instance.currentUser!.uid)
                         .get(),
-                    builder: (context, AsyncSnapshot snapshot) {
-                      if (snapshot.hasData && snapshot.data != null) {
+                    builder:
+                        (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                      if (snapshot.hasData && snapshot.data!.exists) {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 16.0),
                             CircleAvatar(
-                              radius: 25.0,
-                              backgroundImage: NetworkImage(
-                                  snapshot.data['profileImage'] ??
-                                      AppImages.userImage),
-                            ),
+                                radius: 25.0,
+                                backgroundImage: NetworkImage(
+                                    snapshot.data!['profileImage'])),
                             Text(
-                              snapshot.data['firstName'],
+                              snapshot.data!['firstName'],
                               style: poppinsLight.copyWith(
                                 fontSize: 18.0,
                                 color: AppColors.whiteColor,
@@ -91,7 +92,7 @@ class _MenuScreenState extends State<MenuScreen> {
                             /// user number and email
                             const SizedBox(height: 8.0),
                             Text(
-                              '${snapshot.data['phoneNumber']} ${snapshot.data['emailAddress'].contains('@gmail.com') ? snapshot.data['emailAddress'].toString().replaceAll('@gmail.com', '') : snapshot.data['emailAddress'].toString().replaceAll('.com', '')}',
+                              '${snapshot.data!['phoneNumber']} ${snapshot.data!['emailAddress'].contains('@gmail.com') ? snapshot.data!['emailAddress'].toString().replaceAll('@gmail.com', '') : snapshot.data!['emailAddress'].toString().replaceAll('.com', '')}',
                               style: poppinsLight.copyWith(
                                 fontSize: 12.0,
                                 color: AppColors.whiteColor,
@@ -99,10 +100,15 @@ class _MenuScreenState extends State<MenuScreen> {
                             ),
                           ],
                         );
+                      }
+                      if (!snapshot.data!.exists) {
+                        return Text('No User Data Found');
                       } else {
-                        return const Text(
-                          'Loading.....',
-                          style: TextStyle(color: Colors.white),
+                        return Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1,
+                            color: Colors.blue,
+                          ),
                         );
                       }
                     }),
@@ -110,6 +116,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 SizedBox(height: height(context) * 0.02),
                 MenuButtonWidget(
                   onTap: () {
+                    zoomDrawerController.close;
                     Get.offAll(const DrawerScreen());
                   },
                   text: 'home'.tr,
@@ -129,6 +136,13 @@ class _MenuScreenState extends State<MenuScreen> {
                   },
                   text: 'Send Money'.tr,
                   iconPath: AppIcons.sendMoneyIcon,
+                ),
+                MenuButtonWidget(
+                  onTap: () {
+                    Get.to(const BillPayment());
+                  },
+                  text: 'bill'.tr,
+                  iconPath: AppIcons.billPayment,
                 ),
 
                 MenuButtonWidget(
@@ -201,7 +215,9 @@ class _MenuScreenState extends State<MenuScreen> {
                 /// Logout Button
                 MenuButtonWidget(
                   onTap: () {
-                    FirebaseAuth.instance.signOut();
+                    FirebaseAuth.instance.signOut().then((value) {
+                      Get.offAll(const Wrapper());
+                    });
                   },
                   text: 'Logout'.tr,
                   textColor: AppColors.redDarkColor,

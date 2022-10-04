@@ -1,5 +1,7 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:expose_banq/controllers/AuthController/authController.dart';
 import 'package:expose_banq/controllers/LanguageController/languages.dart';
+import 'package:expose_banq/controllers/internetCheckController/internet_check_controller.dart';
 import 'package:expose_banq/view/kyc/kyc_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -7,6 +9,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_zoom_drawer/config.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -17,6 +20,8 @@ import 'package:local_auth/local_auth.dart';
 // import 'package:flutter_config/flutter_config.dart';
 
 import 'view/starter/splash_screen.dart';
+
+final zoomDrawerController = ZoomDrawerController();
 
 late Box box;
 late Locale locale;
@@ -141,6 +146,8 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
+String? string;
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -149,6 +156,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Map source = {ConnectivityResult.none: false};
+  final NetworkConnectivity networkConnectivity = NetworkConnectivity.instance;
+  String string = '';
   @override
   void initState() {
     super.initState();
@@ -156,6 +166,41 @@ class _MyAppState extends State<MyApp> {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('A new message has been published');
     });
+    NetworkConnectivity.initialise();
+    networkConnectivity.myStream.listen((source) {
+      source = source;
+      print('source $source');
+      // 1.
+      switch (source.keys.toList()[0]) {
+        case ConnectivityResult.mobile:
+          string =
+              source.values.toList()[0] ? 'Mobile: Online' : 'Mobile: Offline';
+          break;
+        case ConnectivityResult.wifi:
+          string = source.values.toList()[0] ? 'WiFi: Online' : 'WiFi: Offline';
+          break;
+        case ConnectivityResult.none:
+        default:
+          string = 'Offline';
+      }
+      // 2.
+      setState(() {});
+      // 3.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            string,
+            style: TextStyle(fontSize: 30),
+          ),
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    networkConnectivity.disposeStream();
   }
 
   @override

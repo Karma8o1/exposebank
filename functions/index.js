@@ -71,12 +71,19 @@ exports.sendFlutterWaveOTP = functions.https.onCall(async(data,context)=>{
   
 });
 exports.sendJointAccountRequest = functions.https.onCall(async(data,context)=>{
-  await admin.messaging().sendMulticast({
-    tokens:data.tokens,
-    notification: {
-      title: data.title,
-      body: data.body,
-    },
+  await admin.messaging().send({
+    token:data.senderToken,
+    notification:{
+      title: data.senderTitle,
+      body:data.senderBody,
+    }
+  });
+  await admin.messaging().send({
+    token:data.recieverToke,
+    notification:{
+      title: data.recieverTitle,
+      body:data.recieverBody,
+    }
   });
   return `the user token: ${data.token}`;
 });

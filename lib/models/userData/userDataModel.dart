@@ -95,7 +95,7 @@ class UserData {
       regionOrProvince: snapshot['regionOrProvince'],
       town: snapshot['townController'],
       profile: snapshot['profileImage'],
-      notificationToken: snapshot['notificationToken'],
+      notificationToken: snapshot['nicOrPassportExpiryDate'],
     );
     return userData;
   }

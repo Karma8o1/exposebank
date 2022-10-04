@@ -1,10 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:elegant_notification/elegant_notification.dart';
 import 'package:expose_banq/const/loading.dart';
+import 'package:expose_banq/controllers/accountController/account_controller.dart';
+import 'package:expose_banq/controllers/userDataController/userDataController.dart';
+import 'package:expose_banq/main.dart';
 import 'package:expose_banq/models/privateAccountModel/private_account_model.dart';
 import 'package:expose_banq/view/approval_request_page/approval_request_screen.dart';
 import 'package:expose_banq/view/home/components/open_account_button.dart';
 import 'package:expose_banq/view/home/open_account_screen.dart';
+import 'package:expose_banq/view/security/biometricVerification.dart';
 import 'package:expose_banq/widgets/fade_animation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -13,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 import '../../const/exports.dart';
 import '../deposit/desposit_screen.dart';
@@ -50,9 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
   void initState() {
     super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       // showLoading(context);
-
       FirebaseMessaging.instance.getToken().then((value) {
         FirebaseFirestore.instance
             .collection('userData')
@@ -60,8 +65,18 @@ class _HomeScreenState extends State<HomeScreen> {
             .update({
           'notificationToken': value,
         });
-      }).then((value) {
-        Get.back();
+      }).then((value) async {
+        bool result = await InternetConnectionChecker().hasConnection;
+        if (result == true) {
+          print('Sustainable connections.');
+        } else {
+          print('No internet :( Reason:');
+          ElegantNotification.error(
+                  title: Text('Slow or No Internet Connection'),
+                  description:
+                      Text('Please connect to a proper network and try again!'))
+              .show(context);
+        }
       });
     });
   }
@@ -94,48 +109,19 @@ class _HomeScreenState extends State<HomeScreen> {
           child: AppNameWidget(),
         ),
         actions: [
-          FutureBuilder(
-              future: FirebaseFirestore.instance
-                  .collection('userData')
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .get(),
-              builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                if (snapshot.hasData &&
-                    snapshot.data!['profileImage'] == null) {
-                  return const Padding(
-                    padding: EdgeInsets.only(right: 16.0),
-                    child: CircleAvatar(
-                      radius: 22.0,
-                      backgroundColor: AppColors.redDarkColor,
-                      child: CircleAvatar(
-                        radius: 20.0,
-                        backgroundImage: AssetImage(AppImages.userImage),
-                      ),
-                    ),
-                  );
-                }
-                if (snapshot.hasData &&
-                    snapshot.data!['profileImage'] != null) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: CircleAvatar(
-                      radius: 22.0,
-                      backgroundColor: AppColors.redDarkColor,
-                      child: CircleAvatar(
-                        radius: 20.0,
-                        backgroundImage:
-                            NetworkImage(snapshot.data!['profileImage']),
-                      ),
-                    ),
-                  );
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 1,
-                    ),
-                  );
-                }
-              }),
+          GetBuilder<UserDataController>(builder: (_) {
+            return Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: CircleAvatar(
+                radius: 22.0,
+                backgroundColor: AppColors.redDarkColor,
+                child: CircleAvatar(
+                  radius: 20.0,
+                  backgroundImage: NetworkImage(_.userData.profile),
+                ),
+              ),
+            );
+          })
         ],
       ),
 
@@ -197,21 +183,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (snapshot.hasData &&
                               snapshot.data!.docs.isNotEmpty) {
                             return IconButton(
-                              onPressed: () async {
-                                showLoading(context);
-                                await FirebaseMessaging.instance
-                                    .getToken()
-                                    .then((value) {
-                                  FirebaseFunctions.instance
-                                      .httpsCallable('sendNotification')
-                                      .call({'token': value}).then((value) {
-                                    Get.back();
-                                    print(
-                                        'value from cloud functions: ${value.data}');
-                                  });
-                                });
-
-                                // Get.to(const ApprovalRequestScreen());
+                              onPressed: () {
+                                Get.to(const ApprovalRequestScreen());
                               },
                               icon: Stack(
                                 children: [
@@ -247,21 +220,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                           if (snapshot.data!.docs.isEmpty) {
                             return IconButton(
-                              onPressed: () async {
-                                showLoading(context);
-                                await FirebaseMessaging.instance
-                                    .getToken()
-                                    .then((value) {
-                                  FirebaseFunctions.instance
-                                      .httpsCallable('sendNotification')
-                                      .call({'token': value}).then((value) {
-                                    Get.back();
-                                    print(
-                                        'value from cloud functions: ${value.data}');
-                                  });
-                                });
-
-                                // Get.to(const ApprovalRequestScreen());
+                              onPressed: () {
+                                Get.to(const ApprovalRequestScreen());
                               },
                               icon: Stack(
                                 children: [
@@ -296,20 +256,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           } else {
                             return IconButton(
-                              onPressed: () async {
-                                showLoading(context);
-                                await FirebaseMessaging.instance
-                                    .getToken()
-                                    .then((value) {
-                                  FirebaseFunctions.instance
-                                      .httpsCallable('sendNotification')
-                                      .call({'token': value}).then((value) {
-                                    Get.back();
-                                    print(
-                                        'value from cloud functions: ${value.data}');
-                                  });
-                                });
-                                // Get.to(const ApprovalRequestScreen());
+                              onPressed: () {
+                                Get.to(const ApprovalRequestScreen());
                               },
                               icon: Stack(
                                 children: [
@@ -360,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     .limit(1)
                     .snapshots(),
                 builder: ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                  if (snapshot.hasData && snapshot.data != null) {
                     PrivateAccountModel privateAccount =
                         PrivateAccountModel.fromJSON(snapshot.data!.docs[0]);
                     return Column(
@@ -396,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 16.0),
                                   child: Text(
-                                    'Quick Service',
+                                    'quick_service'.tr,
                                     style: poppinsLight.copyWith(
                                       fontSize: 15.0,
                                       color: AppColors.greyColor,
@@ -426,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             },
                                             icon: CupertinoIcons
                                                 .arrow_right_arrow_left,
-                                            text: 'Transfer',
+                                            text: 'transfer'.tr,
                                           ),
                                           SizedBox(
                                               width: height(context) * 0.032),
@@ -435,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Get.to(const DepositScreen());
                                             },
                                             icon: CupertinoIcons.arrow_down,
-                                            text: 'Deposit',
+                                            text: 'deposit'.tr,
                                           ),
                                           SizedBox(
                                               width: height(context) * 0.032),
@@ -444,7 +392,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Get.to(const WithdrawScreen());
                                             },
                                             icon: CupertinoIcons.arrow_up,
-                                            text: 'Withdraw',
+                                            text: 'withdraw'.tr,
                                             borderColor: AppColors.redDarkColor,
                                           ),
                                         ],
@@ -462,7 +410,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 16.0),
                                   child: Text(
-                                    'Click Button Below To Open Bank Account',
+                                    'clickToOpen'.tr,
                                     style: poppinsLight.copyWith(
                                       fontSize: 15.0,
                                       color: AppColors.greyColor,
@@ -503,7 +451,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 16.0),
                                   child: Text(
-                                    'Transaction History',
+                                    'transactionHistory'.tr,
                                     style: poppinsLight.copyWith(
                                       fontSize: 15.0,
                                       color: AppColors.greyColor,
@@ -587,7 +535,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               4.8,
                                           child: Center(
                                             child: Text(
-                                              'No Transactions till now',
+                                              'noTransactions'.tr,
                                               style: poppinsRegular.copyWith(
                                                 fontSize: 12.0,
                                                 color: Colors.white,
@@ -597,13 +545,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       );
                                     } else {
-                                      return SizedBox(
-                                        height:
-                                            MediaQuery.of(context).size.height /
-                                                5,
-                                        child: const Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 10),
+                                        child: SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              4.8,
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 1,
+                                            ),
                                           ),
                                         ),
                                       );
@@ -615,7 +568,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     );
                   }
-                  if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+                  if (snapshot.data == null) {
                     return const Center(
                       child: Text(
                         'No Accounts Exist',

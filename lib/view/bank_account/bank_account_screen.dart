@@ -6,6 +6,7 @@ import 'package:expose_banq/models/jointAccountModel/joint_account_model.dart';
 import 'package:expose_banq/models/privateAccountModel/private_account_model.dart';
 import 'package:expose_banq/models/transactionModel/transaction_model.dart';
 import 'package:expose_banq/view/approval_request_page/approval_request_screen.dart';
+import 'package:expose_banq/view/drawer/drawer_screen.dart';
 import 'package:expose_banq/widgets/fade_animation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,11 +24,15 @@ import '../payment_transfer/transfer_screen.dart';
 import '../withdraw/withdraw_screen.dart';
 
 class BankAccountPage extends StatefulWidget {
-  BankAccountPage(
-      {Key? key, required this.accountName, required this.accountType})
-      : super(key: key);
+  BankAccountPage({
+    Key? key,
+    required this.accountName,
+    required this.accountType,
+    required this.accountNumber,
+  }) : super(key: key);
   String accountName;
   String accountType;
+  String accountNumber;
 
   @override
   State<BankAccountPage> createState() => _BankAccountPageState();
@@ -54,6 +59,7 @@ class _BankAccountPageState extends State<BankAccountPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.accountNumber);
     return Scaffold(
       backgroundColor: AppColors.blackColor,
 
@@ -64,15 +70,12 @@ class _BankAccountPageState extends State<BankAccountPage> {
         centerTitle: true,
         leading: IconButton(
           onPressed: () {
-            if (ZoomDrawer.of(context)!.isOpen()) {
-              ZoomDrawer.of(context)!.close();
-            } else {
-              ZoomDrawer.of(context)!.open();
-            }
+            Get.offAll(DrawerScreen());
           },
-          icon: const Icon(
-            Icons.menu,
+          icon: Icon(
+            Icons.arrow_back,
             color: AppColors.whiteColor,
+            size: 20,
           ),
         ),
         title: const Padding(
@@ -113,7 +116,7 @@ class _BankAccountPageState extends State<BankAccountPage> {
                 curve: Curves.fastLinearToSlowEaseIn,
                 delay: 0.7,
                 child: BankCardWidget(
-                  accountName: widget.accountName,
+                  accountName: widget.accountNumber,
                   accountType: widget.accountType,
                 )),
 
@@ -143,7 +146,7 @@ class _BankAccountPageState extends State<BankAccountPage> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 16.0),
                       child: Text(
-                        'Quick Service',
+                        'quick_service'.tr,
                         style: poppinsLight.copyWith(
                           fontSize: 15.0,
                           color: AppColors.greyColor,
@@ -170,7 +173,7 @@ class _BankAccountPageState extends State<BankAccountPage> {
                                   Get.to(const TransferScreen());
                                 },
                                 icon: CupertinoIcons.arrow_right_arrow_left,
-                                text: 'Transfer',
+                                text: 'transfer'.tr,
                               ),
                               SizedBox(width: height(context) * 0.032),
                               QuickServiceBox(
@@ -178,7 +181,7 @@ class _BankAccountPageState extends State<BankAccountPage> {
                                   Get.to(const DepositScreen());
                                 },
                                 icon: CupertinoIcons.arrow_down,
-                                text: 'Deposit',
+                                text: 'deposit'.tr,
                               ),
                               SizedBox(width: height(context) * 0.032),
                               QuickServiceBox(
@@ -186,7 +189,7 @@ class _BankAccountPageState extends State<BankAccountPage> {
                                   Get.to(const WithdrawScreen());
                                 },
                                 icon: CupertinoIcons.arrow_up,
-                                text: 'Withdraw',
+                                text: 'withdraw'.tr,
                                 borderColor: AppColors.redDarkColor,
                               ),
                             ],
@@ -204,7 +207,7 @@ class _BankAccountPageState extends State<BankAccountPage> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 16.0),
                       child: Text(
-                        'Transaction History',
+                        'transactionHistory'.tr,
                         style: poppinsLight.copyWith(
                           fontSize: 15.0,
                           color: AppColors.greyColor,
@@ -215,17 +218,16 @@ class _BankAccountPageState extends State<BankAccountPage> {
 
                   /// list of transactions
                   const SizedBox(height: 10.0),
-
                   StreamBuilder(
                       stream: FirebaseFirestore.instance
                           .collection('transactions')
                           .where('accounts', arrayContainsAny: [
-                        widget.accountName
+                        widget.accountNumber
                       ]).snapshots(),
                       builder:
-                          ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.data!.docs.isNotEmpty &&
-                            snapshot.hasData) {
+                          (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.hasData &&
+                            snapshot.data!.docs.isNotEmpty) {
                           return FadeAnimation(
                             curve: Curves.ease,
                             delay: 1.3,
@@ -256,29 +258,36 @@ class _BankAccountPageState extends State<BankAccountPage> {
                             ),
                           );
                         }
-                        if (snapshot.data!.docs.isEmpty && snapshot.hasData) {
+                        if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0),
-                            child: const Center(
-                              child: Text(
-                                'No transaction in this account. Yet!',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height / 4.8,
+                              child: Center(
+                                child: Text(
+                                  'noTransactions'.tr,
+                                  style: poppinsRegular.copyWith(
+                                    fontSize: 12.0,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           );
                         } else {
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 1,
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height / 4.8,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1,
+                                ),
+                              ),
                             ),
                           );
                         }
-                      })),
+                      }),
                 ],
               ),
             ),

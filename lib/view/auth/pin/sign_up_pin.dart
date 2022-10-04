@@ -172,13 +172,18 @@ class _SignUpPinScreenState extends State<SignUpPinScreen> {
                             'isBanned': false,
                           }).then((value) {
                             // showLoading(context);
-                            AccountController.createNewAccounts(
-                              accountName: widget.email.contains('@gmail.com')
-                                  ? widget.email.replaceAll('@gmail.com', '')
-                                  : widget.email.replaceAll('.com', ''),
-                              phoneNumber: widget.phoneNumber,
-                              context: context,
-                            ).then((value) => Get.off(const Wrapper()));
+                            AccountController.createPrivateAccount(
+                                    firstName: widget.firstName,
+                                    lastName: widget.lastName,
+                                    email: widget.email,
+                                    phoneNumber: widget.phoneNumber,
+                                    billingName: widget.email
+                                            .contains('@gmail.com')
+                                        ? widget.email
+                                            .replaceAll('@gmail.com', '')
+                                        : widget.email.replaceAll('.com', ''),
+                                    context: context)
+                                .then((value) => Get.off(const Wrapper()));
                           });
                         });
                       }),

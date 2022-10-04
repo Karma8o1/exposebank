@@ -1,5 +1,5 @@
 class BankModel {
-  String  code, name;
+  String code, name;
   int id;
   BankModel({required this.code, required this.id, required this.name});
   static BankModel fromJson(Map<String, dynamic> json) {

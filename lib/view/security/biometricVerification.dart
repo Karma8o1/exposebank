@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:expose_banq/controllers/biometric/biometricController.dart';
 import 'package:expose_banq/main.dart';
+import 'package:expose_banq/view/drawer/drawer_screen.dart';
 import 'package:expose_banq/widgets/lib/src/flutter_pin_code_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -37,7 +38,7 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
           children: [
             SizedBox(height: height(context) * 0.05),
             Text(
-              'Verify before login',
+              'Verification Required',
               style: poppinsRegular.copyWith(
                 fontSize: 16.0,
                 color: AppColors.whiteColor,
@@ -76,7 +77,7 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
                         setState(() {
                           showVerification = false;
                         });
-                        Get.back();
+                        Get.offAll(DrawerScreen());
                       }
                     },
                     child: Center(
@@ -91,13 +92,13 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
                     setState(() {
                       showVerification = false;
                     });
-                    Get.back();
+                    Get.offAll(DrawerScreen());
                   } else {
                     ElegantNotification.error(
                       title: Text('Error'),
                       description: Text('Pin code does not match'),
                       toastDuration: const Duration(seconds: 5),
-                    );
+                    ).show(context);
                   }
                 },
                 initialPinLength: 4,

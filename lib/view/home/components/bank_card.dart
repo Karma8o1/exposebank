@@ -47,30 +47,38 @@ class BankCardWidget extends StatelessWidget {
                     .doc(accountName as String)
                     .get(),
                 builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                  if (snapshot.hasData) {
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          snapshot.data!['accountName'],
-                          style: poppinsLight.copyWith(
-                            fontSize: 12.0,
-                            color: AppColors.whiteColor,
-                          ),
-                        ),
-                        Container(
-                          width: 50,
-                          child: Text(
-                            snapshot.data!['typeOfAccount'],
+                  if (snapshot.hasData && snapshot.data!.exists) {
+                    if (snapshot.data != null) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            snapshot.data!['accountName'],
                             style: poppinsLight.copyWith(
                               fontSize: 12.0,
                               color: AppColors.whiteColor,
                             ),
                           ),
+                          Container(
+                            width: 50,
+                            child: Text(
+                              snapshot.data!['typeOfAccount'],
+                              style: poppinsLight.copyWith(
+                                fontSize: 12.0,
+                                color: AppColors.whiteColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 1,
                         ),
-                      ],
-                    );
+                      );
+                    }
                   } else {
                     return const Center(
                       child: CircularProgressIndicator(
@@ -116,7 +124,9 @@ class BankCardWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '12022 0149',
+                              accountType == 'jointAccount'
+                                  ? ''
+                                  : snapshot.data!['account_number'],
                               style: poppinsLight.copyWith(
                                 fontSize: 14.0,
                                 color: AppColors.whiteColor,

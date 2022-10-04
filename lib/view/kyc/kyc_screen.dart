@@ -11,6 +11,7 @@ import 'package:expose_banq/const/exports.dart';
 import 'package:expose_banq/const/loading.dart';
 import 'package:expose_banq/controllers/StorageController/storageController.dart';
 import 'package:expose_banq/controllers/AuthController/authController.dart';
+import 'package:expose_banq/main.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -645,7 +646,8 @@ class _KYCScreenState extends State<KYCScreen> {
                           cnicBack != null &&
                           cnicFront != null) {
                         showLoading(context);
-// showLoading(context);
+                        showVerification = false;
+
                         AuthController.registerUser(
                           phoneNumber: widget.phoneNumber,
                           firstName: firstNameController.text.trim(),

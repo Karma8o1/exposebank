@@ -192,7 +192,7 @@ class _TransferScreenState extends State<TransferScreen> {
                         )
                         .snapshots(),
                     builder: ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.data!.docs.isNotEmpty) {
+                      if (snapshot.data!.docs.isNotEmpty && snapshot.data != null) {
                         value = snapshot.data!.docs;
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -662,7 +662,7 @@ class _TransferScreenState extends State<TransferScreen> {
               ),
             ),
             recieverAccountController.text.isNotEmpty
-                ? showAccounts(toAccount)
+                ? showAccounts(toAccount.trim())
                 : SizedBox(),
 
             /// cards list
@@ -714,7 +714,6 @@ class _TransferScreenState extends State<TransferScreen> {
                         title: Text('Error'),
                         description:
                             Text('Account does not have enough funds.'),
-                        dismissible: false,
                         toastDuration: const Duration(seconds: 5),
                         notificationPosition: NotificationPosition.bottom,
                       ).show(context);
@@ -816,7 +815,7 @@ class _TransferScreenState extends State<TransferScreen> {
       return FutureBuilder(
           future: FirebaseFirestore.instance
               .collection('indiAccount')
-              .doc(recieverAccountController.text)
+              .doc(recieverAccountController.text.trim())
               .get(),
           builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
             if (snapshot.hasData && snapshot.data!.exists) {
@@ -893,7 +892,7 @@ class _TransferScreenState extends State<TransferScreen> {
       return FutureBuilder(
           future: FirebaseFirestore.instance
               .collection('jointAccount')
-              .doc(recieverAccountController.text)
+              .doc(recieverAccountController.text.trim())
               .get(),
           builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
             if (snapshot.hasData && snapshot.data!.exists) {

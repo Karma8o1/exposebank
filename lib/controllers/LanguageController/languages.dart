@@ -24,7 +24,16 @@ class LanguageController extends Translations {
           'jointsecurity': 'TIGHT SECURITY JOINT BANK ACCOUNT, FREE.',
           'hardmoney':
               "Ain\'t Nobody Do Away With Your Hard Earning Money!\n This Is The Best Form Of Trust & Transparency",
-              'request': 'You are requested by the admins of group bank account to verify the activity below!',
+          'request':
+              'You are requested by the admins of group bank account to verify the activity below!',
+          'quick_service': 'Quick Service',
+          'deposit': 'Deposit',
+          'withdraw': 'Withdraw',
+          'transfer': 'Transfer',
+          'clickToOpen': 'Click Button Below To Open Account',
+          'transactionHistory': 'Transaction History',
+          'noTransactions': 'No Transactions till now',
+          'bill': 'Bill Payment',
         },
         'fr_FR': {
           'language': "Le français est utilisé comme langue de l'application.",
@@ -47,7 +56,17 @@ class LanguageController extends Translations {
           'jointsecurity': 'COMPTE BANCAIRE COMMUN SÉCURISÉ, GRATUIT.',
           'hardmoney':
               "Personne ne vous enlève votre argent durement gagné !\n C'est la meilleure forme de confiance et de transparence",
-              'request': "Les administrateurs du compte bancaire du groupe vous demandent de vérifier l'activité ci-dessous !"
+          'request':
+              "Les administrateurs du compte bancaire du groupe vous demandent de vérifier l'activité ci-dessous !",
+          'quick_service': 'Service Rapide',
+          'deposit': 'Verser',
+          'withdraw': "Se désister",
+          'transfer': 'Transférer',
+          'clickToOpen':
+              'Cliquez sur le bouton ci-dessous pour ouvrir un compte',
+          'transactionHistory': 'Historique des transactions',
+          'noTransactions': "Aucune transaction jusqu'à présent",
+          'bill': 'Paiement de factures',
         }
       };
 }

@@ -16,4 +16,5 @@ class AppIcons {
   static const String masterCardIcon = 'assets/icons/master.svg';
   static const String searchIcon = 'assets/icons/search.svg';
   static const String visaIcon = 'assets/icons/visa.svg';
+  static const String billPayment = 'assets/icons/bill.svg';
 }

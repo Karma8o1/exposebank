@@ -60,7 +60,6 @@ class AuthController {
               title: const Text('Failed to send code'),
               description: Text(e.message.toString()),
               notificationPosition: NotificationPosition.bottom,
-              dismissible: true,
               autoDismiss: true,
               animationDuration: const Duration(seconds: 5),
               height: 100,
@@ -170,14 +169,25 @@ class AuthController {
             'nicBack': cnicBack,
             'isSuspended': false,
             'isBanned': false,
-          }).then((value) {
-            AccountController.createNewAccounts(
-              accountName: email.contains('@gmail.com')
-                  ? email.replaceAll('@gmail.com', '')
-                  : email.replaceAll('.com', ''),
-              phoneNumber: phoneNumber,
-              context: context,
-            ).then((value) => Get.off(const Wrapper()));
+          }).then((value) async {
+            AccountController.createPrivateAccount(
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    phoneNumber: phoneNumber,
+                    billingName: email.contains('@gmail.com')
+                        ? email.replaceAll('@gmail.com', '')
+                        : email.replaceAll('.com', ''),
+                    context: context)
+                .then((value) => Get.off(const Wrapper()));
+            ;
+            // AccountController.createNewAccounts(
+            //   accountName: email.contains('@gmail.com')
+            //       ? email.replaceAll('@gmail.com', '')
+            //       : email.replaceAll('.com', ''),
+            //   phoneNumber: phoneNumber,
+            //   context: context,
+            // ).then((value) => Get.off(const Wrapper()));
           });
         });
       },
@@ -187,7 +197,6 @@ class AuthController {
           title: const Text('Failed to send code'),
           description: Text(e.message.toString()),
           notificationPosition: NotificationPosition.bottom,
-          dismissible: true,
           autoDismiss: true,
           animationDuration: const Duration(seconds: 2),
           height: 70,

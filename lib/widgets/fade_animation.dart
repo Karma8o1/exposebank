@@ -6,11 +6,12 @@ class FadeAnimation extends StatelessWidget {
   final Widget? child;
   final Curve? curve;
 
-  const FadeAnimation({Key? key,
+  const FadeAnimation({
+    Key? key,
     required this.child,
     this.delay,
     this.curve,
-}) : super(key: key);
+  }) : super(key: key);
 
   @override
   @override

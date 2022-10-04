@@ -38,7 +38,6 @@ class _SplashScreenState extends State<SplashScreen> {
           description:
               const Text("Make sure your device is connected to internet"),
           notificationPosition: NotificationPosition.bottom,
-          dismissible: true,
           autoDismiss: true,
           animationDuration: const Duration(seconds: 2),
           height: 70,

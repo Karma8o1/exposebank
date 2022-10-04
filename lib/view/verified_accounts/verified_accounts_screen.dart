@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expose_banq/controllers/userDataController/userDataController.dart';
 import 'package:expose_banq/models/jointAccountModel/joint_account_model.dart';
 import 'package:expose_banq/models/privateAccountModel/private_account_model.dart';
+import 'package:expose_banq/view/bank_account/bank_account_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -44,7 +45,6 @@ class _VerifiedAccountsScreenState extends State<VerifiedAccountsScreen> {
           child: AppNameWidget(),
         ),
       ),
-
       /// body
       body: GetBuilder<UserDataController>(
         builder: ((_) {
@@ -74,7 +74,7 @@ class _VerifiedAccountsScreenState extends State<VerifiedAccountsScreen> {
                         )
                         .snapshots(),
                     builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                      if (snapshot.hasData && snapshot.data != null) {
                         return Expanded(
                             child: ListView.builder(
                                 itemCount: snapshot.data!.docs.length,
@@ -83,17 +83,24 @@ class _VerifiedAccountsScreenState extends State<VerifiedAccountsScreen> {
                                     userImagePath: _.userData.profile,
                                     isVerify: snapshot.data!.docs[index]
                                         ['isVerified'],
-                                    userNameText: snapshot.data!.docs[index].id,
+                                    accountNumber:
+                                        snapshot.data!.docs[index].id,
                                     paymentValueText: snapshot
                                         .data!.docs[index]['balance']
                                         .toString(),
                                     onTap: () {
-                                      Get.offAll(DrawerOneScreen(
-                                        accountName:
-                                            snapshot.data!.docs[index].id,
+                                      Get.to(BankAccountPage(
+                                        accountName: snapshot.data!.docs[index]
+                                            ['accountName'],
                                         accountType: 'indiAccount',
+                                        accountNumber:
+                                            snapshot.data!.docs[index].id,
                                       ));
                                     },
+                                    accountName: snapshot.data!.docs[index]
+                                        ['accountName'],
+                                    bankName: snapshot.data!.docs[index]
+                                        ['bank_name'],
                                   );
                                 }));
                       }
@@ -145,17 +152,22 @@ class _VerifiedAccountsScreenState extends State<VerifiedAccountsScreen> {
                                   return VerifyBox(
                                     userImagePath: _.userData.profile,
                                     isVerify: true,
-                                    userNameText: snapshot.data!.docs[index].id,
+                                    accountNumber:
+                                        snapshot.data!.docs[index].id,
                                     paymentValueText: snapshot
                                         .data!.docs[index]['balance']
                                         .toString(),
                                     onTap: () {
-                                      Get.offAll(DrawerOneScreen(
-                                        accountName:
-                                            snapshot.data!.docs[index].id,
+                                      Get.to(BankAccountPage(
+                                        accountName: snapshot.data!.docs[index]
+                                            ['accountName'],
                                         accountType: 'jointAccount',
+                                        accountNumber:
+                                            snapshot.data!.docs[index].id,
                                       ));
                                     },
+                                    accountName: '',
+                                    bankName: '',
                                   );
                                 }));
                       }

@@ -68,7 +68,7 @@ class _ApprovalRequestScreenState extends State<ApprovalRequestScreen> {
                           itemBuilder: (context, int index) {
                             return VerifyBox(
                               isVerify: true,
-                              userNameText: snapshot.data!.docs[index]
+                              accountNumber: snapshot.data!.docs[index]
                                   ['accountName'],
                               paymentValueText: snapshot.data!.docs[index]
                                   ['isPermissionGranted'],
@@ -88,6 +88,8 @@ class _ApprovalRequestScreenState extends State<ApprovalRequestScreen> {
                                           'The request has already been: ${snapshot.data!.docs[index]['isPermissionGranted']}'));
                                 }
                               },
+                              accountName: '',
+                              bankName: '',
                             );
                           }),
                     );

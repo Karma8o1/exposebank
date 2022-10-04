@@ -70,6 +70,7 @@ class FlutterwaveController {
         .doc(senderAccount)
         .update({'balance': FieldValue.increment(-int.parse(amount))}).then(
             (value) {
+      //calling flutterwave api for transfer
       https.post(Uri.parse('https://api.flutterwave.com/v3/transfers'),
           body: jsonEncode({
             "account_bank": bank,
@@ -81,12 +82,14 @@ class FlutterwaveController {
             "beneficiary_name": recieverName,
           }),
           headers: {
+            //authorization requires secret key as a bearer
             'Authorization':
                 'Bearer FLWSECK-35948c5eceb1ca6dc7164007ed32b803-X',
             'Content-Type': 'application/json'
           }).then((value) {
         Get.back();
         print(jsonDecode(value.body));
+        //storing data to firebase
         var data = jsonDecode(value.body)['data'];
         FirebaseFirestore.instance.collection('transactions').doc().set({
           'fromAccount': senderAccount,
@@ -205,4 +208,6 @@ class FlutterwaveController {
     var i = blockCipher.encodeB64(text);
     return i;
   }
+
+  static Future<void> getBillPayment() async {}
 }

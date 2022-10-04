@@ -196,7 +196,8 @@ class _DepositScreenState extends State<DepositScreen> {
                           .snapshots(),
                       builder:
                           ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.data!.docs.isNotEmpty) {
+                        if (snapshot.hasData &&
+                            snapshot.data!.docs.isNotEmpty) {
                           value = snapshot.data!.docs;
                           return Padding(
                             padding:
@@ -344,7 +345,8 @@ class _DepositScreenState extends State<DepositScreen> {
                       ).snapshots(),
                       builder:
                           ((context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.data!.docs.isNotEmpty) {
+                        if (snapshot.hasData &&
+                            snapshot.data!.docs.isNotEmpty) {
                           value = snapshot.data!.docs;
                           return Padding(
                             padding:

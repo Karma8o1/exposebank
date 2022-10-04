@@ -132,6 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             setState(() {
                               phoneController.text = phoneNumber as String;
                               pinCodeController.text = pinCode as String;
+                              showVerification = false;
                             });
                             AuthController.signInUser(
                               phoneNumber: phoneNumber as String,
